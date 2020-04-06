@@ -20,7 +20,7 @@ plugins {
     id 'maven'
 }
 
-group 'vip.wuweijie.camel.component.rocketmq'
+group 'vip.wuweijie.camel'
 version '2.25.0'
 
 sourceCompatibility = 1.8
