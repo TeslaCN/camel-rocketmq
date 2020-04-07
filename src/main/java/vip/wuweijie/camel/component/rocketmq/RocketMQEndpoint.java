@@ -75,7 +75,7 @@ public class RocketMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
 
     @Override
     public boolean isSingleton() {
-        return false;
+        return true;
     }
 
     public Exchange createRocketExchange(byte[] body) {

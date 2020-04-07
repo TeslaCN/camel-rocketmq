@@ -21,9 +21,13 @@ plugins {
 }
 
 group 'vip.wuweijie.camel'
-version '2.25.0'
+version '0.0.1-SNAPSHOT'
 
 sourceCompatibility = 1.8
+
+ext {
+    camelCoreVersion = '2.25.0'
+}
 
 repositories {
     mavenLocal()
@@ -32,8 +36,10 @@ repositories {
 }
 
 dependencies {
-    implementation "org.apache.camel:camel-core:${project.version}"
+    implementation "org.apache.camel:camel-core:${camelCoreVersion}"
     implementation "org.apache.rocketmq:rocketmq-client:4.7.0"
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.1'
-    testImplementation "org.apache.camel:camel-spring-boot-starter:${project.version}"
+    testImplementation 'junit:junit:4.12'
+    testImplementation "org.apache.camel:camel-spring-boot-starter:${camelCoreVersion}"
+    testImplementation "io.hawt:hawtio-springboot:2.5.0"
+    testImplementation "org.apache.camel:camel-test-spring:${camelCoreVersion}"
 }

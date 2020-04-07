@@ -23,7 +23,7 @@ import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.exception.RemotingException;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -31,7 +31,7 @@ import java.util.Date;
 /**
  * @author wuweijie
  */
-class RocketMQTest {
+public class RocketMQTest {
 
     public static final String PRODUCER_GROUP = "ROCKET_TEST_PRODUCER";
     public static final String CONSUMER_GROUP = "ROCKET_TEST_CONSUMER";
@@ -42,7 +42,7 @@ class RocketMQTest {
     public static final String NAMESRV_ADDR = "rpi3.lo:9876";
 
     @Test
-    void produce() throws MQClientException, RemotingException, InterruptedException, MQBrokerException {
+    public void produce() throws MQClientException, RemotingException, InterruptedException, MQBrokerException {
         DefaultMQProducer producer = new DefaultMQProducer();
         producer.setNamesrvAddr(NAMESRV_ADDR);
         producer.setProducerGroup(PRODUCER_GROUP);
