@@ -18,32 +18,27 @@
 package vip.wuweijie.camel.component.rocketmq.routes;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
  * @author wuweijie
  */
 @Component
-public class RocketRoute extends RouteBuilder {
-
-    private final Logger logger = LoggerFactory.getLogger(RocketRoute.class);
-
+public class InOutRoute extends RouteBuilder {
     @Override
     public void configure() throws Exception {
-        from("rocketmq:{{rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr}}&consumerGroup={{rocketmq.consumer.group}}")
-                .process(exchange -> {
-                    logger.info("exchange {}", exchange);
-                    logger.info("exchange.in {}", exchange.getIn());
-                    logger.info("exchange.in.body {}", exchange.getIn().getBody());
-                })
-                .to("rocketmq:{{rocketmq.topic.to}}"
-                                + "?namesrvAddr={{rocketmq.namesrv.addr}}"
-                                + "&producerGroup={{rocketmq.producer.group}}"
-//                        + "&waitForSendResult=true"
+        from("rocketmq:{{inout.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr}}" +
+                "&consumerGroup={{inout.rocketmq.consumer.group}}" +
+                "&requestTimeout=10000")
+
+                .inOut("rocketmq:{{inout.rocketmq.topic.to}}?namesrvAddr={{rocketmq.namesrv.addr}}" +
+                        "&producerGroup={{inout.rocketmq.producer.group}}" +
+                        "&replyToTopic={{inout.rocketmq.reply.to.topic}}" +
+                        "&requestTimeout={{inout.request.timeout}}" +
+                        "&replyToConsumerGroup={{inout.rocketmq.reply.to.consumer}}"
                 )
-                .to("log:RocketRoute?showAll=true")
+
+                .to("log:InOutRoute?showAll=true")
         ;
     }
 }

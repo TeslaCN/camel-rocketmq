@@ -18,6 +18,8 @@
 plugins {
     id 'java'
     id 'maven'
+    id 'maven-publish'
+    id 'signing'
 }
 
 group 'vip.wuweijie.camel'
@@ -42,4 +44,68 @@ dependencies {
     testImplementation "org.apache.camel:camel-spring-boot-starter:${camelCoreVersion}"
     testImplementation "io.hawt:hawtio-springboot:2.5.0"
     testImplementation "org.apache.camel:camel-test-spring:${camelCoreVersion}"
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'camel-rocketmq'
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            pom {
+                name = 'camel-rocketmq'
+                description = 'Camel RocketMQ Component'
+                url = 'https://github.com/TeslaCN/camel-rocketmq'
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'TeslaCN'
+                        name = 'wuweijie'
+                        email = 'wuweijie.io@qq.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/TeslaCN/camel-rocketmq.git'
+                    developerConnection = 'scm:git:ssh://github.com/TeslaCN/camel-rocketmq.git'
+                    url = 'https://github.com/TeslaCN/camel-rocketmq'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username NEXUS_USERNAME
+                password NEXUS_PASSWORD
+            }
+        }
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Camel RocketMQ',
+                'Implementation-Version': version
+    }
+}
+signing {
+    sign publishing.publications.mavenJava
 }

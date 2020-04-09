@@ -19,28 +19,43 @@ package vip.wuweijie.camel.component.rocketmq;
 
 import org.apache.camel.AsyncCallback;
 import org.apache.camel.Exchange;
+import org.apache.camel.FailedToCreateProducerException;
 import org.apache.camel.NoTypeConversionAvailableException;
 import org.apache.camel.impl.DefaultAsyncProducer;
+import org.apache.camel.util.ObjectHelper;
+import org.apache.camel.util.ServiceHelper;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import vip.wuweijie.camel.component.rocketmq.reply.ReplyManager;
+import vip.wuweijie.camel.component.rocketmq.reply.RocketMQReplyManagerSupport;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author wuweijie
  */
 public class RocketMQProducer extends DefaultAsyncProducer {
 
+    public static final String GENERATE_MESSAGE_KEY_PREFIX = "camel-rocketmq-";
+
     private final Logger logger = LoggerFactory.getLogger(RocketMQProducer.class);
 
     private DefaultMQProducer mqProducer;
+
+    private final AtomicBoolean started = new AtomicBoolean(false);
+    private ReplyManager replyManager;
 
     public RocketMQProducer(RocketMQEndpoint endpoint) {
         super(endpoint);
@@ -62,9 +77,9 @@ public class RocketMQProducer extends DefaultAsyncProducer {
         }
 
         try {
+            logger.trace("Exchange Pattern {}", exchange.getPattern());
             if (exchange.getPattern().isOutCapable()) {
-                // TODO processInOut
-                return true;
+                return processInOut(exchange, callback);
             } else {
                 return processInOnly(exchange, callback);
             }
@@ -75,29 +90,130 @@ public class RocketMQProducer extends DefaultAsyncProducer {
         }
     }
 
-    protected boolean processInOnly(Exchange exchange, AsyncCallback callback) throws NoTypeConversionAvailableException,
-            InterruptedException, RemotingException, MQClientException, MQBrokerException {
-        Message message = new Message(getEndpoint().getTopicName(), getEndpoint().getTag(), getEndpoint().getKey(),
-                exchange.getContext().getTypeConverter().mandatoryConvertTo(byte[].class, exchange, exchange.getIn().getBody()));
+    protected boolean processInOut(final Exchange exchange, final AsyncCallback callback) throws RemotingException, MQClientException, InterruptedException, NoTypeConversionAvailableException {
+        org.apache.camel.Message in = exchange.getIn();
+        Message message = new Message();
+        message.setTopic(in.getHeader(RocketMQConstants.OVERRIDE_TOPIC_NAME, () -> getEndpoint().getTopicName(), String.class));
+        message.setTags(in.getHeader(RocketMQConstants.OVERRIDE_TAG, () -> getEndpoint().getSendTag(), String.class));
+        message.setBody(exchange.getContext().getTypeConverter().mandatoryConvertTo(byte[].class, exchange, in.getBody()));
+        message.setKeys(in.getHeader(RocketMQConstants.OVERRIDE_MESSAGE_KEY, String.class));
+
+        initReplyManager();
+
+        String generateKey = GENERATE_MESSAGE_KEY_PREFIX + getEndpoint().getCamelContext().getUuidGenerator().generateUuid();
+        message.setKeys(Arrays.asList(Optional.ofNullable(message.getKeys()).orElse(""), generateKey));
+
         logger.debug("RocketMQ Producer sending {}", message);
         mqProducer.send(message, new SendCallback() {
             @Override
             public void onSuccess(SendResult sendResult) {
-                callback.done(true);
+                if (!SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
+                    exchange.setException(new SendFailedException(sendResult.toString()));
+                    callback.done(false);
+                }
+                replyManager.registerReply(replyManager, exchange, callback, generateKey, getEndpoint().getRequestTimeout());
+            }
+
+            @Override
+            public void onException(Throwable e) {
+                replyManager.cancelMessageKey(generateKey);
+                exchange.setException(e);
+                callback.done(false);
+            }
+        });
+        return false;
+    }
+
+    protected void initReplyManager() {
+        if (!started.get()) {
+            synchronized (this) {
+                if (started.get()) {
+                    return;
+                }
+                log.debug("Starting reply manager");
+
+                ClassLoader current = Thread.currentThread().getContextClassLoader();
+                ClassLoader ac = getEndpoint().getCamelContext().getApplicationContextClassLoader();
+                try {
+                    if (ac != null) {
+                        Thread.currentThread().setContextClassLoader(ac);
+                    }
+
+                    if (getEndpoint().getReplyToTopic() != null) {
+                        replyManager = createReplyManager();
+                        logger.debug("Using RocketMQReplyManager: {} to process replies from topic {}", replyManager, getEndpoint().getReplyToTopic());
+                    }
+                } catch (Exception e) {
+                    throw new FailedToCreateProducerException(getEndpoint(), e);
+                } finally {
+                    if (ac != null) {
+                        Thread.currentThread().setContextClassLoader(current);
+                    }
+                }
+                started.set(true);
+            }
+        }
+    }
+
+    protected void unInitReplyManager() {
+        try {
+            if (replyManager != null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Stopping RocketMQReplyManager: {} from processing replies from : {}", replyManager, getEndpoint().getReplyToTopic());
+                }
+                ServiceHelper.stopService(replyManager);
+            }
+        } catch (Exception e) {
+            throw ObjectHelper.wrapRuntimeCamelException(e);
+        } finally {
+            started.set(false);
+        }
+    }
+
+    private ReplyManager createReplyManager() throws Exception {
+        RocketMQReplyManagerSupport replyManager = new RocketMQReplyManagerSupport(getEndpoint().getCamelContext());
+        replyManager.setEndpoint(getEndpoint());
+
+        String name = "RocketMQReplyManagerTimeoutChecker[" + getEndpoint().getTopicName() + "]";
+        ScheduledExecutorService scheduledExecutorService = getEndpoint().getCamelContext().getExecutorServiceManager().newSingleThreadScheduledExecutor(name, name);
+        replyManager.setScheduledExecutorService(scheduledExecutorService);
+        log.debug("Starting ReplyManager: {}", name);
+        ServiceHelper.startService(replyManager);
+
+        return replyManager;
+    }
+
+    protected boolean processInOnly(Exchange exchange, AsyncCallback callback) throws NoTypeConversionAvailableException,
+            InterruptedException, RemotingException, MQClientException, MQBrokerException {
+        org.apache.camel.Message in = exchange.getIn();
+        Message message = new Message();
+        message.setTopic(in.getHeader(RocketMQConstants.OVERRIDE_TOPIC_NAME, () -> getEndpoint().getTopicName(), String.class));
+        message.setTags(in.getHeader(RocketMQConstants.OVERRIDE_TAG, () -> getEndpoint().getSendTag(), String.class));
+        message.setBody(exchange.getContext().getTypeConverter().mandatoryConvertTo(byte[].class, exchange, in.getBody()));
+        message.setKeys(in.getHeader(RocketMQConstants.OVERRIDE_MESSAGE_KEY, String.class));
+        logger.debug("RocketMQ Producer sending {}", message);
+        boolean waitForSendResult = getEndpoint().getWaitForSendResult();
+        mqProducer.send(message, new SendCallback() {
+            @Override
+            public void onSuccess(SendResult sendResult) {
+                if (!SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
+                    exchange.setException(new SendFailedException(sendResult.toString()));
+                }
+                callback.done(!waitForSendResult);
             }
 
             @Override
             public void onException(Throwable e) {
                 exchange.setException(e);
-                callback.done(true);
+                callback.done(!waitForSendResult);
             }
         });
-        return true;
+        // return false to wait send callback
+        return !waitForSendResult;
     }
 
     @Override
     protected void doStart() throws Exception {
-        super.doStart();
         this.mqProducer = new DefaultMQProducer(getEndpoint().getProducerGroup());
         this.mqProducer.setNamesrvAddr(getEndpoint().getNamesrvAddr());
         this.mqProducer.start();
@@ -105,7 +221,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
 
     @Override
     protected void doStop() throws Exception {
-        super.doStop();
+        unInitReplyManager();
         this.mqProducer.shutdown();
         this.mqProducer = null;
     }

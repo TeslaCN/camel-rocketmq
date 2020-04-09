@@ -58,7 +58,9 @@ public class RocketMQConsumer extends DefaultConsumer implements Suspendable {
         mqPushConsumer.registerMessageListener(new MessageListenerConcurrently() {
             @Override
             public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
-                Exchange exchange = endpoint.createRocketExchange(msgs.get(0).getBody());
+                MessageExt messageExt = msgs.get(0);
+                Exchange exchange = endpoint.createRocketExchange(messageExt.getBody());
+                getEndpoint().getMessageConverter().setExchangeHeadersByMessageExt(exchange, messageExt);
                 try {
                     getProcessor().process(exchange);
                 } catch (Exception e) {

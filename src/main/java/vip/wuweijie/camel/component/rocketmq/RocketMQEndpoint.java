@@ -45,17 +45,27 @@ public class RocketMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
     @UriParam(label = "consumer")
     private String consumerGroup;
 
+    private final RocketMQMessageConverter messageConverter = new RocketMQMessageConverter();
+    @UriParam(label = "consumer")
+    private String subscribeTags;
+    @UriParam(label = "producer")
+    private String sendTag;
     @UriParam(label = "common")
-    private String tag;
-
-    @UriParam(label = "common")
-    private String key;
-
-    @UriParam(label = "common")
-    private String namesrvAddr;
+    private String namesrvAddr = "localhost:9876";
+    @UriParam(label = "producer")
+    private String replyToTopic;
+    @UriParam(label = "producer")
+    private String replyToConsumerGroup;
+    @UriParam(label = "advance")
+    private Long requestTimeout = 10000L;
+    @UriParam(label = "advance")
+    private Long requestTimeoutCheckerInterval = 1000L;
 
     public RocketMQEndpoint() {
     }
+
+    @UriParam(label = "producer")
+    private Boolean waitForSendResult = false;
 
     public RocketMQEndpoint(String endpointUri, RocketMQComponent component) {
         super(endpointUri, component);
@@ -95,20 +105,20 @@ public class RocketMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
         this.topicName = topicName;
     }
 
-    public String getTag() {
-        return tag;
+    public String getSubscribeTags() {
+        return subscribeTags;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
+    public void setSubscribeTags(String subscribeTags) {
+        this.subscribeTags = subscribeTags;
     }
 
-    public String getKey() {
-        return key;
+    public String getSendTag() {
+        return sendTag;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setSendTag(String sendTag) {
+        this.sendTag = sendTag;
     }
 
     public String getNamesrvAddr() {
@@ -133,5 +143,49 @@ public class RocketMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
 
     public void setConsumerGroup(String consumerGroup) {
         this.consumerGroup = consumerGroup;
+    }
+
+    public String getReplyToTopic() {
+        return replyToTopic;
+    }
+
+    public void setReplyToTopic(String replyToTopic) {
+        this.replyToTopic = replyToTopic;
+    }
+
+    public String getReplyToConsumerGroup() {
+        return replyToConsumerGroup;
+    }
+
+    public void setReplyToConsumerGroup(String replyToConsumerGroup) {
+        this.replyToConsumerGroup = replyToConsumerGroup;
+    }
+
+    public RocketMQMessageConverter getMessageConverter() {
+        return messageConverter;
+    }
+
+    public Long getRequestTimeout() {
+        return requestTimeout;
+    }
+
+    public void setRequestTimeout(Long requestTimeout) {
+        this.requestTimeout = requestTimeout;
+    }
+
+    public Long getRequestTimeoutCheckerInterval() {
+        return requestTimeoutCheckerInterval;
+    }
+
+    public void setRequestTimeoutCheckerInterval(Long requestTimeoutCheckerInterval) {
+        this.requestTimeoutCheckerInterval = requestTimeoutCheckerInterval;
+    }
+
+    public Boolean getWaitForSendResult() {
+        return waitForSendResult;
+    }
+
+    public void setWaitForSendResult(Boolean waitForSendResult) {
+        this.waitForSendResult = waitForSendResult;
     }
 }

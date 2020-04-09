@@ -40,14 +40,29 @@ public class RocketMQComponent extends DefaultComponent {
     @Metadata(label = "consumer")
     private String consumerGroup;
 
-    @Metadata(label = "common")
-    private String tag;
+    @Metadata(label = "consumer")
+    private String subscribeTags;
 
     @Metadata(label = "common")
-    private String key;
+    private String sendTag;
 
     @Metadata(label = "common")
     private String namesrvAddr;
+
+    @Metadata(label = "producer")
+    private String replyToTopic;
+
+    @Metadata(label = "producer")
+    private String replyToConsumerGroup;
+
+    @Metadata(label = "advance")
+    private Long requestTimeout;
+
+    @Metadata(label = "advance")
+    private Long requestTimeoutCheckerInterval;
+
+    @Metadata(label = "producer")
+    private Boolean waitForSendResult;
 
     @Override
     protected RocketMQEndpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
@@ -69,20 +84,20 @@ public class RocketMQComponent extends DefaultComponent {
         this.topicName = topicName;
     }
 
-    public String getTag() {
-        return tag;
+    public String getSubscribeTags() {
+        return subscribeTags;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
+    public void setSubscribeTags(String subscribeTags) {
+        this.subscribeTags = subscribeTags;
     }
 
-    public String getKey() {
-        return key;
+    public String getSendTag() {
+        return sendTag;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setSendTag(String sendTag) {
+        this.sendTag = sendTag;
     }
 
     public String getNamesrvAddr() {
@@ -107,5 +122,45 @@ public class RocketMQComponent extends DefaultComponent {
 
     public void setConsumerGroup(String consumerGroup) {
         this.consumerGroup = consumerGroup;
+    }
+
+    public String getReplyToTopic() {
+        return replyToTopic;
+    }
+
+    public void setReplyToTopic(String replyToTopic) {
+        this.replyToTopic = replyToTopic;
+    }
+
+    public String getReplyToConsumerGroup() {
+        return replyToConsumerGroup;
+    }
+
+    public void setReplyToConsumerGroup(String replyToConsumerGroup) {
+        this.replyToConsumerGroup = replyToConsumerGroup;
+    }
+
+    public Long getRequestTimeout() {
+        return requestTimeout;
+    }
+
+    public void setRequestTimeout(Long requestTimeout) {
+        this.requestTimeout = requestTimeout;
+    }
+
+    public Long getRequestTimeoutCheckerInterval() {
+        return requestTimeoutCheckerInterval;
+    }
+
+    public void setRequestTimeoutCheckerInterval(Long requestTimeoutCheckerInterval) {
+        this.requestTimeoutCheckerInterval = requestTimeoutCheckerInterval;
+    }
+
+    public Boolean getWaitForSendResult() {
+        return waitForSendResult;
+    }
+
+    public void setWaitForSendResult(Boolean waitForSendResult) {
+        this.waitForSendResult = waitForSendResult;
     }
 }
