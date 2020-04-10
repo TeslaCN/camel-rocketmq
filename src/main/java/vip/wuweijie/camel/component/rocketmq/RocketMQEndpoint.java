@@ -38,34 +38,30 @@ public class RocketMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
     @UriPath
     @Metadata(required = "true")
     private String topicName;
-
     @UriParam(label = "producer")
     private String producerGroup;
-
     @UriParam(label = "consumer")
     private String consumerGroup;
-
     private final RocketMQMessageConverter messageConverter = new RocketMQMessageConverter();
-    @UriParam(label = "consumer")
-    private String subscribeTags;
-    @UriParam(label = "producer")
-    private String sendTag;
-    @UriParam(label = "common")
-    private String namesrvAddr = "localhost:9876";
+    @UriParam(label = "consumer", defaultValue = "*")
+    private String subscribeTags = "*";
+    @UriParam(label = "producer", defaultValue = "")
+    private String sendTag = "";
     @UriParam(label = "producer")
     private String replyToTopic;
     @UriParam(label = "producer")
     private String replyToConsumerGroup;
-    @UriParam(label = "advance")
+    @UriParam(label = "common", defaultValue = "localhost:9876")
+    private String namesrvAddr = "localhost:9876";
+    @UriParam(label = "advance", defaultValue = "10000")
     private Long requestTimeout = 10000L;
-    @UriParam(label = "advance")
+    @UriParam(label = "advance", defaultValue = "1000")
     private Long requestTimeoutCheckerInterval = 1000L;
+    @UriParam(label = "producer", defaultValue = "false")
+    private Boolean waitForSendResult = false;
 
     public RocketMQEndpoint() {
     }
-
-    @UriParam(label = "producer")
-    private Boolean waitForSendResult = false;
 
     public RocketMQEndpoint(String endpointUri, RocketMQComponent component) {
         super(endpointUri, component);

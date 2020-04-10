@@ -40,14 +40,14 @@ public class RocketMQComponent extends DefaultComponent {
     @Metadata(label = "consumer")
     private String consumerGroup;
 
-    @Metadata(label = "consumer")
-    private String subscribeTags;
+    @Metadata(label = "consumer", defaultValue = "*")
+    private String subscribeTags = "*";
 
-    @Metadata(label = "common")
-    private String sendTag;
+    @Metadata(label = "common", defaultValue = "")
+    private String sendTag = "";
 
-    @Metadata(label = "common")
-    private String namesrvAddr;
+    @Metadata(label = "common", defaultValue = "localhost:9876")
+    private String namesrvAddr = "localhost:9876";
 
     @Metadata(label = "producer")
     private String replyToTopic;
@@ -55,14 +55,14 @@ public class RocketMQComponent extends DefaultComponent {
     @Metadata(label = "producer")
     private String replyToConsumerGroup;
 
-    @Metadata(label = "advance")
-    private Long requestTimeout;
+    @Metadata(label = "advance", defaultValue = "10000")
+    private Long requestTimeout = 10000L;
 
-    @Metadata(label = "advance")
-    private Long requestTimeoutCheckerInterval;
+    @Metadata(label = "advance", defaultValue = "1000")
+    private Long requestTimeoutCheckerInterval = 1000L;
 
-    @Metadata(label = "producer")
-    private Boolean waitForSendResult;
+    @Metadata(label = "producer", defaultValue = "false")
+    private Boolean waitForSendResult = false;
 
     @Override
     protected RocketMQEndpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
