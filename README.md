@@ -2,6 +2,31 @@
 
 ## 快速入门
 
+版本对应:
+
+| Camel 版本 | 组件版本 | 最新 Release |
+|---|---|---|
+| 3.2.0 | 3.2.0-* | 3.2.0-0.0.1 |
+| 2.25.0 | 2.25.0-* | 2.25.0-0.0.1
+
+Maven:
+```xml
+<dependency>
+    <groupId>vip.wuweijie.camel</groupId>
+    <artifactId>camel-rocketmq</artifactId>
+    <version>3.2.0-0.0.1</version>
+</dependency>
+```
+
+Gradle:
+```
+implementation 'vip.wuweijie.camel:camel-rocketmq:3.2.0-0.0.1'
+```
+or
+```
+compile 'vip.wuweijie.camel:camel-rocketmq:3.2.0-0.0.1'
+```
+
 ### 基本使用
 ```
 from("rocketmq:from_topic?namesrvAddr=localhost:9876&consumerGroup=consumer")
