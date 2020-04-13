@@ -60,3 +60,26 @@ from("rocketmq:{{inout.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr
 | replyToConsumerGroup | producer | 监听回复的消费者组 ||
 | requestTimeout | producer | 等待回复时间 | 10000 |
 | requestTimeoutCheckerInterval | advance | 回复超时检查间隔 | 1000 |
+
+## Exchange Header
+
+| 常量名 | 常量值 | 含义 |
+|---|---|---| 
+| `RocketMQConstants.OVERRIDE_TOPIC_NAME` | `rocketmq.OVERRIDE_TOPIC_NAME` | 覆盖路由配置的消息 Topic |
+| `RocketMQConstants.OVERRIDE_TAG` | `rocketmq.OVERRIDE_TAG` | 覆盖路由配置的消息 Tag |
+| `RocketMQConstants.OVERRIDE_MESSAGE_KEY` | `rocketmq.OVERRIDE_MESSAGE_KEY` | 设置消息 Key |
+
+```
+from("rocketmq:{{override.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr}}&consumerGroup={{override.rocketmq.consumer.group}}")
+        .process(exchange -> {
+            exchange.getMessage().setHeader(RocketMQConstants.OVERRIDE_TOPIC_NAME, "OVERRIDE_TO");
+            exchange.getMessage().setHeader(RocketMQConstants.OVERRIDE_TAG, "OVERRIDE_TAG");
+            exchange.getMessage().setHeader(RocketMQConstants.OVERRIDE_MESSAGE_KEY, "OVERRIDE_MESSAGE_KEY");
+        }
+)
+.to("rocketmq:{{override.rocketmq.topic.to}}"
+                + "?namesrvAddr={{rocketmq.namesrv.addr}}"
+                + "&producerGroup={{override.rocketmq.producer.group}}"
+)
+.to("log:RocketRoute?showAll=true")
+```
