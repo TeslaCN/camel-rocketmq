@@ -19,7 +19,7 @@ package vip.wuweijie.camel.component.rocketmq;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
-import org.apache.camel.impl.DefaultMessage;
+import org.apache.camel.support.DefaultMessage;
 import org.apache.rocketmq.common.message.MessageExt;
 
 import static vip.wuweijie.camel.component.rocketmq.RocketMQConstants.*;

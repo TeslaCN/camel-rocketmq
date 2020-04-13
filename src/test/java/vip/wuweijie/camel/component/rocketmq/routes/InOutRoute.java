@@ -28,14 +28,15 @@ public class InOutRoute extends RouteBuilder {
     @Override
     public void configure() throws Exception {
         from("rocketmq:{{inout.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr}}" +
-                "&consumerGroup={{inout.rocketmq.consumer.group}}" +
-                "&requestTimeout=10000")
+                "&consumerGroup={{inout.rocketmq.consumer.group}}"
+        )
 
                 .inOut("rocketmq:{{inout.rocketmq.topic.to}}?namesrvAddr={{rocketmq.namesrv.addr}}" +
                         "&producerGroup={{inout.rocketmq.producer.group}}" +
                         "&replyToTopic={{inout.rocketmq.reply.to.topic}}" +
                         "&requestTimeout={{inout.request.timeout}}" +
                         "&replyToConsumerGroup={{inout.rocketmq.reply.to.consumer}}"
+                        + "&requestTimeoutCheckerInterval={{inout.request.timeout.checker.interval}}"
                 )
 
                 .to("log:InOutRoute?showAll=true")

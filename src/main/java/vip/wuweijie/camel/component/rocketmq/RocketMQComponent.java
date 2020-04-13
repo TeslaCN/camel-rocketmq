@@ -17,8 +17,8 @@
 
 package vip.wuweijie.camel.component.rocketmq;
 
-import org.apache.camel.impl.DefaultComponent;
 import org.apache.camel.spi.Metadata;
+import org.apache.camel.support.DefaultComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +31,7 @@ public class RocketMQComponent extends DefaultComponent {
 
     private final Logger logger = LoggerFactory.getLogger(RocketMQComponent.class);
 
-    @Metadata(required = "true")
+    @Metadata(required = true)
     private String topicName;
 
     @Metadata(label = "producer")

@@ -28,7 +28,7 @@ version '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
 ext {
-    camelCoreVersion = '2.25.0'
+    camelCoreVersion = '3.2.0'
 }
 
 repositories {
@@ -40,19 +40,19 @@ repositories {
 dependencies {
     implementation "org.apache.camel:camel-core:${camelCoreVersion}"
     implementation "org.apache.rocketmq:rocketmq-client:4.7.0"
-    testImplementation 'junit:junit:4.12'
-    testImplementation "org.apache.camel:camel-spring-boot-starter:${camelCoreVersion}"
-    testImplementation "io.hawt:hawtio-springboot:2.5.0"
+    testImplementation 'junit:junit:4.13'
+    testImplementation "org.apache.camel.springboot:camel-spring-boot-starter:${camelCoreVersion}"
+    testImplementation "io.hawt:hawtio-springboot:2.9.1"
     testImplementation "org.apache.camel:camel-test-spring:${camelCoreVersion}"
 }
 
 task sourcesJar(type: Jar) {
     from sourceSets.main.allJava
-    classifier = 'sources'
+    archiveClassifier.set('source')
 }
 task javadocJar(type: Jar) {
     from javadoc
-    classifier = 'javadoc'
+    archiveClassifier.set('javadoc')
 }
 
 publishing {
@@ -103,7 +103,7 @@ publishing {
 jar {
     manifest {
         attributes 'Implementation-Title': 'Camel RocketMQ',
-                'Implementation-Version': version
+                'Implementation-Version': archiveVersion
     }
 }
 signing {

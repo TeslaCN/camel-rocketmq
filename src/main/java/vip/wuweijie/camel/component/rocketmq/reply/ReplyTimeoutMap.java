@@ -28,61 +28,41 @@ public class ReplyTimeoutMap extends DefaultTimeoutMap<String, ReplyHandler> {
 
     public ReplyTimeoutMap(ScheduledExecutorService executor, long requestMapPollTimeMillis) {
         super(executor, requestMapPollTimeMillis);
+        addListener(this::listener);
     }
 
-    @Override
-    public boolean onEviction(String key, ReplyHandler value) {
-        try {
-            value.onTimeout(key);
-        } catch (Throwable e) {
-            log.warn("Error processing onTimeout for messageKey: " + key + " due: " + e.getLocalizedMessage() + ". This exception is ignored.", e);
+    private static long encode(long timeoutMillis) {
+        return timeoutMillis > 0 ? timeoutMillis : Integer.MAX_VALUE;
+    }
+
+    private void listener(Listener.Type type, String key, ReplyHandler handler) {
+        switch (type) {
+            case Put:
+                log.trace("Add messageKey: {}", key);
+                break;
+            case Remove:
+                log.trace("Remove messageKey: {}", key);
+                break;
+            case Evict:
+                try {
+                    handler.onTimeout(key);
+                } catch (Throwable e) {
+                    log.warn("Error processing onTimeout for messageKey: " + key + " due: " + e.getLocalizedMessage()
+                            + ". This exception is ignored.", e);
+                }
+                log.trace("Evicted messageKey: {}", key);
+                break;
+            default:
         }
-
-        log.trace("Ecivted messageKey: {}", key);
-        return true;
-    }
-
-    @Override
-    public ReplyHandler get(String key) {
-        ReplyHandler handler = super.get(key);
-        log.trace("Get messageKey: {} -> {}", key, handler != null);
-        return handler;
     }
 
     @Override
     public ReplyHandler put(String key, ReplyHandler value, long timeoutMillis) {
-        ReplyHandler handler;
-        if (timeoutMillis <= 0) {
-            handler = super.put(key, value, Integer.MAX_VALUE);
-        } else {
-            handler = super.put(key, value, timeoutMillis);
-        }
-        log.debug("Added messageKey: {} to timeout after : {} millis", key, timeoutMillis);
-        return handler;
+        return super.put(key, value, encode(timeoutMillis));
     }
 
     @Override
     public ReplyHandler putIfAbsent(String key, ReplyHandler value, long timeoutMillis) {
-        log.trace("putIfAbsent with key {}", key);
-
-        ReplyHandler handler;
-        if (timeoutMillis <= 0) {
-            handler = super.putIfAbsent(key, value, Integer.MAX_VALUE);
-        } else {
-            handler = super.putIfAbsent(key, value, timeoutMillis);
-        }
-        if (handler == null) {
-            log.debug("Added messageKey: {} to timeout after : {} millis", key, timeoutMillis);
-        } else {
-            log.trace("Duplicate messageKey: {} detected", key);
-        }
-        return handler;
-    }
-
-    @Override
-    public ReplyHandler remove(String key) {
-        ReplyHandler handler = super.remove(key);
-        log.trace("Removed messageKey: {} -> {}", key, handler != null);
-        return handler;
+        return super.putIfAbsent(key, value, encode(timeoutMillis));
     }
 }

@@ -21,9 +21,9 @@ import org.apache.camel.AsyncCallback;
 import org.apache.camel.Exchange;
 import org.apache.camel.FailedToCreateProducerException;
 import org.apache.camel.NoTypeConversionAvailableException;
-import org.apache.camel.impl.DefaultAsyncProducer;
+import org.apache.camel.support.DefaultAsyncProducer;
+import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.util.ObjectHelper;
-import org.apache.camel.util.ServiceHelper;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
@@ -130,7 +130,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
                 if (started.get()) {
                     return;
                 }
-                log.debug("Starting reply manager");
+                logger.debug("Starting reply manager");
 
                 ClassLoader current = Thread.currentThread().getContextClassLoader();
                 ClassLoader ac = getEndpoint().getCamelContext().getApplicationContextClassLoader();
@@ -158,8 +158,8 @@ public class RocketMQProducer extends DefaultAsyncProducer {
     protected void unInitReplyManager() {
         try {
             if (replyManager != null) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Stopping RocketMQReplyManager: {} from processing replies from : {}", replyManager, getEndpoint().getReplyToTopic());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Stopping RocketMQReplyManager: {} from processing replies from : {}", replyManager, getEndpoint().getReplyToTopic());
                 }
                 ServiceHelper.stopService(replyManager);
             }
@@ -177,7 +177,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
         String name = "RocketMQReplyManagerTimeoutChecker[" + getEndpoint().getTopicName() + "]";
         ScheduledExecutorService scheduledExecutorService = getEndpoint().getCamelContext().getExecutorServiceManager().newSingleThreadScheduledExecutor(name, name);
         replyManager.setScheduledExecutorService(scheduledExecutorService);
-        log.debug("Starting ReplyManager: {}", name);
+        logger.debug("Starting ReplyManager: {}", name);
         ServiceHelper.startService(replyManager);
 
         return replyManager;
