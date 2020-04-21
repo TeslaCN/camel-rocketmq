@@ -111,6 +111,11 @@ public class RocketMQProducer extends DefaultAsyncProducer {
                     exchange.setException(new SendFailedException(sendResult.toString()));
                     callback.done(false);
                 }
+                if (replyManager == null) {
+                    logger.warn("replyToTopic not set! Will not wait for reply.");
+                    callback.done(false);
+                    return;
+                }
                 replyManager.registerReply(replyManager, exchange, callback, generateKey, getEndpoint().getRequestTimeout());
             }
 
