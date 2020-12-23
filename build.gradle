@@ -76,7 +76,7 @@ publishing {
                     developer {
                         id = 'TeslaCN'
                         name = 'wuweijie'
-                        email = 'wuweijie.io@qq.com'
+                        email = 'wuweijie@apache.org'
                     }
                 }
                 scm {
