@@ -14,4 +14,4 @@
 #    limitations under the License.
 #
 #
-class=vip.wuweijie.camel.component.rocketmq.RocketMQComponent
+class=icu.wwj.camel.component.rocketmq.RocketMQComponent
