@@ -96,7 +96,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
         message.setTopic(in.getHeader(RocketMQConstants.OVERRIDE_TOPIC_NAME, () -> getEndpoint().getTopicName(), String.class));
         message.setTags(in.getHeader(RocketMQConstants.OVERRIDE_TAG, () -> getEndpoint().getSendTag(), String.class));
         message.setBody(exchange.getContext().getTypeConverter().mandatoryConvertTo(byte[].class, exchange, in.getBody()));
-        message.setKeys(in.getHeader(RocketMQConstants.OVERRIDE_MESSAGE_KEY, String.class));
+        message.setKeys(in.getHeader(RocketMQConstants.OVERRIDE_MESSAGE_KEY, "", String.class));
 
         initReplyManager();
 
@@ -195,7 +195,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
         message.setTopic(in.getHeader(RocketMQConstants.OVERRIDE_TOPIC_NAME, () -> getEndpoint().getTopicName(), String.class));
         message.setTags(in.getHeader(RocketMQConstants.OVERRIDE_TAG, () -> getEndpoint().getSendTag(), String.class));
         message.setBody(exchange.getContext().getTypeConverter().mandatoryConvertTo(byte[].class, exchange, in.getBody()));
-        message.setKeys(in.getHeader(RocketMQConstants.OVERRIDE_MESSAGE_KEY, String.class));
+        message.setKeys(in.getHeader(RocketMQConstants.OVERRIDE_MESSAGE_KEY, "", String.class));
         logger.debug("RocketMQ Producer sending {}", message);
         boolean waitForSendResult = getEndpoint().getWaitForSendResult();
         mqProducer.send(message, new SendCallback() {
