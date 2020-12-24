@@ -56,6 +56,7 @@ public class RocketMQConsumer extends DefaultConsumer implements Suspendable {
         mqPushConsumer.setNamesrvAddr(endpoint.getNamesrvAddr());
         mqPushConsumer.subscribe(endpoint.getTopicName(), "*");
         mqPushConsumer.registerMessageListener(new MessageListenerConcurrently() {
+
             @Override
             public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
                 MessageExt messageExt = msgs.get(0);
@@ -85,9 +86,9 @@ public class RocketMQConsumer extends DefaultConsumer implements Suspendable {
     public RocketMQEndpoint getEndpoint() {
         return (RocketMQEndpoint) super.getEndpoint();
     }
-
+    
     @Override
-    protected void doSuspend() throws Exception {
+    protected void doSuspend() {
         stopConsumer();
     }
 
