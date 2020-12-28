@@ -1,37 +1,35 @@
 # Camel RocketMQ component
 
 ![https://github.com/TeslaCN/camel-rocketmq/actions?query=workflow%3A%22Java+CI+with+Gradle%22](https://img.shields.io/github/workflow/status/TeslaCN/camel-rocketmq/Java%20CI%20with%20Gradle)
-![https://repo.maven.apache.org/maven2/vip/wuweijie/camel/camel-rocketmq/](https://img.shields.io/maven-central/v/vip.wuweijie.camel/camel-rocketmq)
+![https://repo.maven.apache.org/maven2/icu/wwj/camel/camel-rocketmq/](https://img.shields.io/maven-central/v/icu.wwj.camel/camel-rocketmq)
 ![https://github.com/TeslaCN/camel-rocketmq](https://img.shields.io/github/repo-size/TeslaCN/camel-rocketmq)
 
 ## 快速入门
 
-版本对应:
-
-| Camel 版本 | 组件版本 | 最新 Release |
-|---|---|---|
-| 3.2.0 | 3.2.0-* | 3.2.0-0.0.1 |
-| 2.25.0 | 2.25.0-* | 2.25.0-0.0.1
-
 Maven:
+
 ```xml
+
 <dependency>
-    <groupId>vip.wuweijie.camel</groupId>
+    <groupId>icu.wwj.camel</groupId>
     <artifactId>camel-rocketmq</artifactId>
-    <version>3.2.0-0.0.1</version>
+    <version>3.2.0-RC1</version>
 </dependency>
 ```
 
-Gradle:
-```
-implementation 'vip.wuweijie.camel:camel-rocketmq:3.2.0-0.0.1'
-```
-or
-```
-compile 'vip.wuweijie.camel:camel-rocketmq:3.2.0-0.0.1'
-```
+版本对应:
+
+| Camel 版本 | 组件版本 | Release |
+|---|---|---|
+| 3.2.0 | 3.2.0-\* | 3.2.0-RC1 |
+| 2.25.0 | 2.25.0-\* | 2.25.0-0.0.1 |
+
+历史版本 groupId 为 `vip.wuweijie.camel`。可以在中央仓库查看：
+
+[https://repo.maven.apache.org/maven2/vip/wuweijie/camel/camel-rocketmq/](https://repo.maven.apache.org/maven2/vip/wuweijie/camel/camel-rocketmq/)
 
 ### 基本使用
+
 ```
 from("rocketmq:from_topic?namesrvAddr=localhost:9876&consumerGroup=consumer")
     .to("rocketmq:to_topic?namesrvAddr=localhost:9876&producerGroup=producer");
