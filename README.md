@@ -1,8 +1,8 @@
 # Camel RocketMQ component
 
-![https://github.com/TeslaCN/camel-rocketmq/actions?query=workflow%3A%22Java+CI+with+Gradle%22](https://img.shields.io/github/workflow/status/TeslaCN/camel-rocketmq/Java%20CI%20with%20Gradle)
-![https://repo.maven.apache.org/maven2/icu/wwj/camel/camel-rocketmq/](https://img.shields.io/maven-central/v/icu.wwj.camel/camel-rocketmq)
-![https://github.com/TeslaCN/camel-rocketmq](https://img.shields.io/github/repo-size/TeslaCN/camel-rocketmq)
+[![GitHub Actions](https://img.shields.io/github/workflow/status/TeslaCN/camel-rocketmq/Java%20CI%20with%20Gradle)](https://github.com/TeslaCN/camel-rocketmq/actions?query=workflow%3A%22Java+CI+with+Gradle%22)
+[![Maven Central](https://img.shields.io/maven-central/v/icu.wwj.camel/camel-rocketmq)](https://repo.maven.apache.org/maven2/icu/wwj/camel/camel-rocketmq/)
+[![GitHub camel-rocketmq](https://img.shields.io/github/repo-size/TeslaCN/camel-rocketmq)](https://github.com/TeslaCN/camel-rocketmq)
 
 ## 快速入门
 
