@@ -33,7 +33,7 @@ Elder version's groupId is `vip.wuweijie.camel`, which can be found in:
 
 ### Basic Usage
 
-```
+```java
 from("rocketmq:from_topic?namesrvAddr=localhost:9876&consumerGroup=consumer")
     .to("rocketmq:to_topic?namesrvAddr=localhost:9876&producerGroup=producer");
 ```
@@ -49,7 +49,7 @@ When a message from `ReplyToTpic` contains the key, it means that the reply rece
 
 If `requestTimeout` elapsed and no reply received, an exception will be thrown.
 
-```
+```java
 from("rocketmq:{{inout.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr}}" +
         "&consumerGroup={{inout.rocketmq.consumer.group}}" +
         "&requestTimeout=10000")
@@ -97,7 +97,7 @@ Notice: **In InOut pattern, the message won't be routed until reply received.**
 | `RocketMQConstants.OVERRIDE_TAG` | `rocketmq.OVERRIDE_TAG` | Override the message's Tag |
 | `RocketMQConstants.OVERRIDE_MESSAGE_KEY` | `rocketmq.OVERRIDE_MESSAGE_KEY` | Set the message's Key |
 
-```
+```java
 from("rocketmq:{{override.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr}}&consumerGroup={{override.rocketmq.consumer.group}}")
         .process(exchange -> {
             exchange.getMessage().setHeader(RocketMQConstants.OVERRIDE_TOPIC_NAME, "OVERRIDE_TO");
