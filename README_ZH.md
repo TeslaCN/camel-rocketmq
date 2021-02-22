@@ -35,7 +35,7 @@ Maven:
 
 ```java
 from("rocketmq:from_topic?namesrvAddr=localhost:9876&consumerGroup=consumer")
-        .to("rocketmq:to_topic?namesrvAddr=localhost:9876&producerGroup=producer");
+    .to("rocketmq:to_topic?namesrvAddr=localhost:9876&producerGroup=producer");
 ```
 
 ### InOut 模式
@@ -52,13 +52,13 @@ Producer 消息发送后，启动一个 Consumer 监听 `ReplyToTopic` 参数配
 from("rocketmq:{{inout.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr}}"+
         "&consumerGroup={{inout.rocketmq.consumer.group}}"+
         "&requestTimeout=10000")
-        
-        .inOut("rocketmq:{{inout.rocketmq.topic.to}}?namesrvAddr={{rocketmq.namesrv.addr}}"+
-        "&producerGroup={{inout.rocketmq.producer.group}}"+
-        "&replyToTopic={{inout.rocketmq.reply.to.topic}}"+
-        "&requestTimeout={{inout.request.timeout}}"+
+
+.inOut("rocketmq:{{inout.rocketmq.topic.to}}?namesrvAddr={{rocketmq.namesrv.addr}}" +
+        "&producerGroup={{inout.rocketmq.producer.group}}" +
+        "&replyToTopic={{inout.rocketmq.reply.to.topic}}" +
+        "&requestTimeout={{inout.request.timeout}}" +
         "&replyToConsumerGroup={{inout.rocketmq.reply.to.consumer}}"
-        )
+)
 
 .to("log:InOutRoute?showAll=true")
 ```
@@ -98,15 +98,15 @@ from("rocketmq:{{inout.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr
 
 ```java
 from("rocketmq:{{override.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr}}&consumerGroup={{override.rocketmq.consumer.group}}")
-        .process(exchange->{
-        exchange.getMessage().setHeader(RocketMQConstants.OVERRIDE_TOPIC_NAME,"OVERRIDE_TO");
-        exchange.getMessage().setHeader(RocketMQConstants.OVERRIDE_TAG,"OVERRIDE_TAG");
-        exchange.getMessage().setHeader(RocketMQConstants.OVERRIDE_MESSAGE_KEY,"OVERRIDE_MESSAGE_KEY");
+        .process(exchange -> {
+            exchange.getMessage().setHeader(RocketMQConstants.OVERRIDE_TOPIC_NAME, "OVERRIDE_TO");
+            exchange.getMessage().setHeader(RocketMQConstants.OVERRIDE_TAG, "OVERRIDE_TAG");
+            exchange.getMessage().setHeader(RocketMQConstants.OVERRIDE_MESSAGE_KEY, "OVERRIDE_MESSAGE_KEY");
         }
-        )
-        .to("rocketmq:{{override.rocketmq.topic.to}}"
-        +"?namesrvAddr={{rocketmq.namesrv.addr}}"
-        +"&producerGroup={{override.rocketmq.producer.group}}"
+)
+.to("rocketmq:{{override.rocketmq.topic.to}}"
+                + "?namesrvAddr={{rocketmq.namesrv.addr}}"
+                + "&producerGroup={{override.rocketmq.producer.group}}"
 )
 .to("log:RocketRoute?showAll=true")
 ```
