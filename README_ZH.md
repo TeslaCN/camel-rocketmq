@@ -7,7 +7,7 @@
 [![EN doc](https://img.shields.io/badge/document-English-blue.svg)](https://github.com/TeslaCN/camel-rocketmq/blob/master/README.md)
 [![CN doc](https://img.shields.io/badge/文档-中文版-blue.svg)](https://github.com/TeslaCN/camel-rocketmq/blob/master/README_ZH.md)
 
-## Getting Started
+## 快速入门
 
 Maven:
 
@@ -20,34 +20,33 @@ Maven:
 </dependency>
 ```
 
-Versions:
+版本对应:
 
-| Camel version | Component version | Release |
+| Camel 版本 | 组件版本 | Release |
 |---|---|---|
 | 3.2.0 | 3.2.0-\* | 3.2.0-RC1 |
 | 2.25.0 | 2.25.0-\* | 2.25.0-0.0.1 |
 
-Elder version's groupId is `vip.wuweijie.camel`, which can be found in:
+历史版本 groupId 为 `vip.wuweijie.camel`。可以在中央仓库查看：
 
 [https://repo.maven.apache.org/maven2/vip/wuweijie/camel/camel-rocketmq/](https://repo.maven.apache.org/maven2/vip/wuweijie/camel/camel-rocketmq/)
 
-### Basic Usage
+### 基本使用
 
 ```
 from("rocketmq:from_topic?namesrvAddr=localhost:9876&consumerGroup=consumer")
     .to("rocketmq:to_topic?namesrvAddr=localhost:9876&producerGroup=producer");
 ```
 
-### InOut Pattern
+### InOut 模式
 
-InOut Pattern based on Message Key. When the producer sending the message, a messageKey will be generated and append to
-the message's key.
+InOut 模式的实现借助了 Message Key，Producer 在发送消息的时候，会生成一个 messageKey 追加到消息的 key 部分。
 
-After the message sent, a consumer will listen to the topic configured by the parameter `ReplyToTopic`.
+Producer 消息发送后，启动一个 Consumer 监听 `ReplyToTopic` 参数配置的 Topic。
 
-When a message from `ReplyToTpic` contains the key, it means that the reply received and continue routing.
+当 `ReplyToTpic` 中的消息包含发送消息时生成的 Key，则对应消息的 Reply 已收到，继续执行后续路由。
 
-If `requestTimeout` elapsed and no reply received, an exception will be thrown.
+如果超过 `requestTimeout` 毫秒后仍然没有收到 Reply，则抛出异常。
 
 ```
 from("rocketmq:{{inout.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr}}" +
@@ -64,38 +63,38 @@ from("rocketmq:{{inout.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr
 .to("log:InOutRoute?showAll=true")
 ```
 
-Notice: **In InOut pattern, the message won't be routed until reply received.**
+注意：**在 InOut 模式下，只有收到 Reply 才会继续路由**
 
-## Component Parameters
+## 组件参数
 
-### InOnly Pattern
+### InOnly 模式
 
-| Name | Type | Description | Default |
+| 参数 | 类型 | 含义 | 默认值 |
 |---|---|---|---|
-| topicName | common | (Required) consumer/producer's topic |  | 
-| namesrvAddr | common | NameServer (Separate by comma) | localhost:9876 |
-| consumerGroup | consumer | Consumer group name |  |
-| subscribeTags | consumer | Subscribe tags expression | * |
-| producerGroup | producer | Producer group name |  | 
-| sendTag | producer | Send message's tag |  |
-| waitForSendResult | producer | Block until message sent | false |
+| topicName | common | （必须）消费或生产消息的 topic 名称 |  | 
+| namesrvAddr | common | NameServer 地址，英文逗号分隔 | localhost:9876 |
+| consumerGroup | consumer | 消费者组名称 |  |
+| subscribeTags | consumer | 订阅消息 Tag 表达式 | * |
+| producerGroup | producer | 生产者组名称 |  | 
+| sendTag | producer | 发送消息 Tag |  |
+| waitForSendResult | producer | 是否阻塞发送消息 | false |
 
-### InOut Pattern
+### InOut 模式
 
-| Name | Type | Description | Default |
+| 参数 | 类型 | 含义 | 默认值 |
 |---|---|---|---|
-| replyToTopic | producer | The topic to listen for reply ||
-| replyToConsumerGroup | producer | Consumer group ||
-| requestTimeout | producer | Wait for milliseconds before timeout | 10000 |
-| requestTimeoutCheckerInterval | advance | Timeout checker interval (milliseconds) | 1000 |
+| replyToTopic | producer | 监听回复的 Topic ||
+| replyToConsumerGroup | producer | 监听回复的消费者组 ||
+| requestTimeout | producer | 等待回复时间 | 10000 |
+| requestTimeoutCheckerInterval | advance | 回复超时检查间隔 | 1000 |
 
 ## Exchange Header
 
-| Constant | Value | Description |
+| 常量名 | 常量值 | 含义 |
 |---|---|---| 
-| `RocketMQConstants.OVERRIDE_TOPIC_NAME` | `rocketmq.OVERRIDE_TOPIC_NAME` | Override the message's Topic |
-| `RocketMQConstants.OVERRIDE_TAG` | `rocketmq.OVERRIDE_TAG` | Override the message's Tag |
-| `RocketMQConstants.OVERRIDE_MESSAGE_KEY` | `rocketmq.OVERRIDE_MESSAGE_KEY` | Set the message's Key |
+| `RocketMQConstants.OVERRIDE_TOPIC_NAME` | `rocketmq.OVERRIDE_TOPIC_NAME` | 覆盖路由配置的消息 Topic |
+| `RocketMQConstants.OVERRIDE_TAG` | `rocketmq.OVERRIDE_TAG` | 覆盖路由配置的消息 Tag |
+| `RocketMQConstants.OVERRIDE_MESSAGE_KEY` | `rocketmq.OVERRIDE_MESSAGE_KEY` | 设置消息 Key |
 
 ```
 from("rocketmq:{{override.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr}}&consumerGroup={{override.rocketmq.consumer.group}}")
