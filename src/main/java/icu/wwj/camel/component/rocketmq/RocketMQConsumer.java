@@ -52,7 +52,7 @@ public class RocketMQConsumer extends DefaultConsumer implements Suspendable {
         if (mqPushConsumer != null) {
             logger.warn("Overriding RocketMQ Consumer! {}", mqPushConsumer);
         }
-        mqPushConsumer = new DefaultMQPushConsumer(endpoint.getConsumerGroup());
+        mqPushConsumer = new DefaultMQPushConsumer(null, endpoint.getConsumerGroup(), AclUtils.getAclRPCHook(getEndpoint().getAccessKey(), getEndpoint().getSecretKey()));
         mqPushConsumer.setNamesrvAddr(endpoint.getNamesrvAddr());
         mqPushConsumer.subscribe(endpoint.getTopicName(), "*");
         mqPushConsumer.registerMessageListener(new MessageListenerConcurrently() {
@@ -86,7 +86,7 @@ public class RocketMQConsumer extends DefaultConsumer implements Suspendable {
     public RocketMQEndpoint getEndpoint() {
         return (RocketMQEndpoint) super.getEndpoint();
     }
-    
+
     @Override
     protected void doSuspend() {
         stopConsumer();

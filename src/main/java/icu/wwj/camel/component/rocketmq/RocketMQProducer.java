@@ -26,12 +26,16 @@ import org.apache.camel.NoTypeConversionAvailableException;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.support.DefaultAsyncProducer;
 import org.apache.camel.support.service.ServiceHelper;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.rocketmq.acl.common.AclClientRPCHook;
+import org.apache.rocketmq.acl.common.SessionCredentials;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.remoting.RPCHook;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,21 +50,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author wuweijie
  */
 public class RocketMQProducer extends DefaultAsyncProducer {
-    
+
     public static final String GENERATE_MESSAGE_KEY_PREFIX = "camel-rocketmq-";
-    
+
     private final Logger logger = LoggerFactory.getLogger(RocketMQProducer.class);
-    
+
     private final AtomicBoolean started = new AtomicBoolean(false);
-    
+
     private DefaultMQProducer mqProducer;
-    
+
     private ReplyManager replyManager;
-    
+
     public RocketMQProducer(RocketMQEndpoint endpoint) {
         super(endpoint);
     }
-    
+
     @Override
     public RocketMQEndpoint getEndpoint() {
         return (RocketMQEndpoint) super.getEndpoint();
@@ -169,7 +173,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
             started.set(false);
         }
     }
-    
+
     private ReplyManager createReplyManager() {
         RocketMQReplyManagerSupport replyManager = new RocketMQReplyManagerSupport(getEndpoint().getCamelContext());
         replyManager.setEndpoint(getEndpoint());
@@ -180,7 +184,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
         ServiceHelper.startService(replyManager);
         return replyManager;
     }
-    
+
     protected boolean processInOnly(Exchange exchange, AsyncCallback callback) throws NoTypeConversionAvailableException, InterruptedException, RemotingException, MQClientException {
         org.apache.camel.Message in = exchange.getIn();
         Message message = new Message();
@@ -212,11 +216,11 @@ public class RocketMQProducer extends DefaultAsyncProducer {
 
     @Override
     protected void doStart() throws Exception {
-        this.mqProducer = new DefaultMQProducer(getEndpoint().getProducerGroup());
+        this.mqProducer = new DefaultMQProducer(null, getEndpoint().getProducerGroup(), AclUtils.getAclRPCHook(getEndpoint().getAccessKey(), getEndpoint().getSecretKey()));
         this.mqProducer.setNamesrvAddr(getEndpoint().getNamesrvAddr());
         this.mqProducer.start();
     }
-    
+
     @Override
     protected void doStop() {
         unInitReplyManager();

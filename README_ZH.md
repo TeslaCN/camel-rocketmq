@@ -73,6 +73,8 @@ from("rocketmq:{{inout.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr
 |---|---|---|---|
 | topicName | common | （必须）消费或生产消息的 topic 名称 |  | 
 | namesrvAddr | common | NameServer 地址，英文逗号分隔 | localhost:9876 |
+| accessKey | common | Rocketmq acl accessKey |  |
+| secretKey | common | Rocketmq acl secretKey |  |
 | consumerGroup | consumer | 消费者组名称 |  |
 | subscribeTags | consumer | 订阅消息 Tag 表达式 | * |
 | producerGroup | producer | 生产者组名称 |  | 

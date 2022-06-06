@@ -18,6 +18,7 @@
 package icu.wwj.camel.component.rocketmq;
 
 import org.apache.camel.spi.Metadata;
+import org.apache.camel.spi.UriParam;
 import org.apache.camel.support.DefaultComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +64,12 @@ public class RocketMQComponent extends DefaultComponent {
 
     @Metadata(label = "producer", defaultValue = "false")
     private Boolean waitForSendResult = false;
+
+    @Metadata(label = "accessKey")
+    private String accessKey;
+
+    @Metadata(label = "secretKey")
+    private String secretKey;
 
     @Override
     protected RocketMQEndpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
@@ -162,5 +169,21 @@ public class RocketMQComponent extends DefaultComponent {
 
     public void setWaitForSendResult(Boolean waitForSendResult) {
         this.waitForSendResult = waitForSendResult;
+    }
+
+    public String getAccessKey() {
+        return accessKey;
+    }
+
+    public void setAccessKey(String accessKey) {
+        this.accessKey = accessKey;
+    }
+
+    public String getSecretKey() {
+        return secretKey;
+    }
+
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
     }
 }
