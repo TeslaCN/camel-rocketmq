@@ -26,12 +26,15 @@ import org.apache.camel.NoTypeConversionAvailableException;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.support.DefaultAsyncProducer;
 import org.apache.camel.support.service.ServiceHelper;
+import org.apache.rocketmq.acl.common.AclClientRPCHook;
+import org.apache.rocketmq.acl.common.SessionCredentials;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.remoting.RPCHook;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -210,9 +213,19 @@ public class RocketMQProducer extends DefaultAsyncProducer {
         return !waitForSendResult;
     }
 
+    /**
+     * Create acl hook.
+     * @param accessKey
+     * @param secretKey
+     * @return RPCHook
+     */
+    private RPCHook getAclRPCHook(String accessKey, String secretKey) {
+        return new AclClientRPCHook(new SessionCredentials(accessKey,secretKey));
+    }
+
     @Override
     protected void doStart() throws Exception {
-        this.mqProducer = new DefaultMQProducer(getEndpoint().getProducerGroup());
+        this.mqProducer = new DefaultMQProducer(null, getEndpoint().getProducerGroup(), getAclRPCHook(getEndpoint().getAccessKey(), getEndpoint().getSecretKey()));
         this.mqProducer.setNamesrvAddr(getEndpoint().getNamesrvAddr());
         this.mqProducer.start();
     }

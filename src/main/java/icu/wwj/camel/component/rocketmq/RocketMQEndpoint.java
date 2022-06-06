@@ -63,6 +63,10 @@ public class RocketMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
     private Long requestTimeoutCheckerInterval = 1000L;
     @UriParam(label = "producer", defaultValue = "false")
     private Boolean waitForSendResult = false;
+    @UriParam(label = "accessKey")
+    private String accessKey;
+    @UriParam(label = "secretKey")
+    private String secretKey;
 
     public RocketMQEndpoint() {
     }
@@ -187,5 +191,21 @@ public class RocketMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
 
     public void setWaitForSendResult(Boolean waitForSendResult) {
         this.waitForSendResult = waitForSendResult;
+    }
+
+    public String getAccessKey() {
+        return accessKey;
+    }
+
+    public void setAccessKey(String accessKey) {
+        this.accessKey = accessKey;
+    }
+
+    public String getSecretKey() {
+        return secretKey;
+    }
+
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
     }
 }
