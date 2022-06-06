@@ -74,6 +74,8 @@ Notice: **In InOut pattern, the message won't be routed until reply received.**
 |---|---|---|---|
 | topicName | common | (Required) consumer/producer's topic |  | 
 | namesrvAddr | common | NameServer (Separate by comma) | localhost:9876 |
+| accessKey | common | Rocketmq acl accessKey |  |
+| secretKey | common | Rocketmq acl secretKey |  |
 | consumerGroup | consumer | Consumer group name |  |
 | subscribeTags | consumer | Subscribe tags expression | * |
 | producerGroup | producer | Producer group name |  | 

@@ -26,6 +26,7 @@ import org.apache.camel.NoTypeConversionAvailableException;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.support.DefaultAsyncProducer;
 import org.apache.camel.support.service.ServiceHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.rocketmq.acl.common.AclClientRPCHook;
 import org.apache.rocketmq.acl.common.SessionCredentials;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -49,21 +50,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @author wuweijie
  */
 public class RocketMQProducer extends DefaultAsyncProducer {
-    
+
     public static final String GENERATE_MESSAGE_KEY_PREFIX = "camel-rocketmq-";
-    
+
     private final Logger logger = LoggerFactory.getLogger(RocketMQProducer.class);
-    
+
     private final AtomicBoolean started = new AtomicBoolean(false);
-    
+
     private DefaultMQProducer mqProducer;
-    
+
     private ReplyManager replyManager;
-    
+
     public RocketMQProducer(RocketMQEndpoint endpoint) {
         super(endpoint);
     }
-    
+
     @Override
     public RocketMQEndpoint getEndpoint() {
         return (RocketMQEndpoint) super.getEndpoint();
@@ -172,7 +173,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
             started.set(false);
         }
     }
-    
+
     private ReplyManager createReplyManager() {
         RocketMQReplyManagerSupport replyManager = new RocketMQReplyManagerSupport(getEndpoint().getCamelContext());
         replyManager.setEndpoint(getEndpoint());
@@ -183,7 +184,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
         ServiceHelper.startService(replyManager);
         return replyManager;
     }
-    
+
     protected boolean processInOnly(Exchange exchange, AsyncCallback callback) throws NoTypeConversionAvailableException, InterruptedException, RemotingException, MQClientException {
         org.apache.camel.Message in = exchange.getIn();
         Message message = new Message();
@@ -213,23 +214,13 @@ public class RocketMQProducer extends DefaultAsyncProducer {
         return !waitForSendResult;
     }
 
-    /**
-     * Create acl hook.
-     * @param accessKey
-     * @param secretKey
-     * @return RPCHook
-     */
-    private RPCHook getAclRPCHook(String accessKey, String secretKey) {
-        return new AclClientRPCHook(new SessionCredentials(accessKey,secretKey));
-    }
-
     @Override
     protected void doStart() throws Exception {
-        this.mqProducer = new DefaultMQProducer(null, getEndpoint().getProducerGroup(), getAclRPCHook(getEndpoint().getAccessKey(), getEndpoint().getSecretKey()));
+        this.mqProducer = new DefaultMQProducer(null, getEndpoint().getProducerGroup(), AclUtils.getAclRPCHook(getEndpoint().getAccessKey(), getEndpoint().getSecretKey()));
         this.mqProducer.setNamesrvAddr(getEndpoint().getNamesrvAddr());
         this.mqProducer.start();
     }
-    
+
     @Override
     protected void doStop() {
         unInitReplyManager();
