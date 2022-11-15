@@ -1,7 +1,7 @@
 # Project exclude paths
-/.gradle/
-/build/
 /out/
 /out/production/classes/
 /out/test/classes/
 /.idea/
+.mvn/wrapper/maven-wrapper.jar
+target/
