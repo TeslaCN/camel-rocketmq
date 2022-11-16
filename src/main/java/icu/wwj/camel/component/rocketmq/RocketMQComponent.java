@@ -19,6 +19,8 @@ package icu.wwj.camel.component.rocketmq;
 
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriParam;
+import org.apache.camel.spi.UriPath;
+import org.apache.camel.spi.annotations.Component;
 import org.apache.camel.support.DefaultComponent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +30,12 @@ import java.util.Map;
 /**
  * @author wuweijie
  */
+@Component("rocketmq")
 public class RocketMQComponent extends DefaultComponent {
 
     private final Logger logger = LoggerFactory.getLogger(RocketMQComponent.class);
 
+    @UriPath
     @Metadata(required = true)
     private String topicName;
 
