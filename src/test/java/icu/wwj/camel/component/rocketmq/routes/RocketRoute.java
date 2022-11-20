@@ -20,12 +20,10 @@ package icu.wwj.camel.component.rocketmq.routes;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
  * @author wuweijie
  */
-@Component
 public class RocketRoute extends RouteBuilder {
 
     private final Logger logger = LoggerFactory.getLogger(RocketRoute.class);

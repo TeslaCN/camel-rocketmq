@@ -18,12 +18,11 @@
 package icu.wwj.camel.component.rocketmq.routes;
 
 import org.apache.camel.builder.RouteBuilder;
-import org.springframework.stereotype.Component;
+import org.apache.camel.spi.annotations.Component;
 
 /**
  * @author wuweijie
  */
-@Component
 public class InOutRoute extends RouteBuilder {
     @Override
     public void configure() throws Exception {
