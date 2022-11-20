@@ -21,12 +21,10 @@ import icu.wwj.camel.component.rocketmq.RocketMQConstants;
 import org.apache.camel.builder.RouteBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
  * @author wuweijie
  */
-@Component
 public class OverrideHeaderRoute extends RouteBuilder {
 
     private final Logger logger = LoggerFactory.getLogger(OverrideHeaderRoute.class);

@@ -35,10 +35,6 @@ public class RocketMQComponent extends DefaultComponent {
 
     private final Logger logger = LoggerFactory.getLogger(RocketMQComponent.class);
 
-    @UriPath
-    @Metadata(required = true)
-    private String topicName;
-
     @Metadata(label = "producer")
     private String producerGroup;
 
@@ -77,22 +73,11 @@ public class RocketMQComponent extends DefaultComponent {
 
     @Override
     protected RocketMQEndpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
-
         RocketMQEndpoint endpoint = new RocketMQEndpoint(uri, this);
-        endpoint.setTopicName(remaining);
+        
         setProperties(endpoint, parameters);
-        if (endpoint.getNamesrvAddr() == null) {
-            endpoint.setNamesrvAddr("localhost:9876");
-        }
+        endpoint.setTopicName(remaining);
         return endpoint;
-    }
-
-    public String getTopicName() {
-        return topicName;
-    }
-
-    public void setTopicName(String topicName) {
-        this.topicName = topicName;
     }
 
     public String getSubscribeTags() {
