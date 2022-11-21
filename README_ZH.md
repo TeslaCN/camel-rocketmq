@@ -16,7 +16,7 @@ Maven:
 <dependency>
     <groupId>icu.wwj.camel</groupId>
     <artifactId>camel-rocketmq</artifactId>
-    <version>3.2.0-RC1</version>
+    <version>3.2.0</version>
 </dependency>
 ```
 
@@ -24,7 +24,7 @@ Maven:
 
 | Camel 版本 | 组件版本 | Release |
 |---|---|---|
-| 3.2.0 | 3.2.0-\* | 3.2.0-RC1 |
+| 3.2.0 | 3.2.0-\* | 3.2.0 |
 | 2.25.0 | 2.25.0-\* | 2.25.0-0.0.1 |
 
 历史版本 groupId 为 `vip.wuweijie.camel`。可以在中央仓库查看：

@@ -16,7 +16,7 @@ Maven:
 <dependency>
     <groupId>icu.wwj.camel</groupId>
     <artifactId>camel-rocketmq</artifactId>
-    <version>3.2.0-RC1</version>
+    <version>3.2.0</version>
 </dependency>
 ```
 
@@ -24,7 +24,7 @@ Versions:
 
 | Camel version | Component version | Release |
 |---|---|---|
-| 3.2.0 | 3.2.0-\* | 3.2.0-RC1 |
+| 3.2.0 | 3.2.0-\* | 3.2.0 |
 | 2.25.0 | 2.25.0-\* | 2.25.0-0.0.1 |
 
 Elder version's groupId is `vip.wuweijie.camel`, which can be found in:
