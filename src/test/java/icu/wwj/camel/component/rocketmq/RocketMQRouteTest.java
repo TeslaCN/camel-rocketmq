@@ -11,9 +11,9 @@ import org.junit.jupiter.api.Test;
 
 public class RocketMQRouteTest extends CamelTestSupport {
 
-    private static final String START_ENDPOINT_URI = "rocketmq:START_TOPIC?namesrvAddr=127.0.0.1:59876&producerGroup=p&consumerGroup=c";
-
-    private static final String INTERMEDIATE_ENDPOINT_URI = "rocketmq:INTERMEDIATE_TOPIC?namesrvAddr=127.0.0.1:59876&producerGroup=p&consumerGroup=c";
+    private static final String START_ENDPOINT_URI = "rocketmq:START_TOPIC?namesrvAddr=127.0.0.1:59876&producerGroup=p1&consumerGroup=c1";
+    
+    private static final String INTERMEDIATE_ENDPOINT_URI = "rocketmq:INTERMEDIATE_TOPIC?namesrvAddr=127.0.0.1:59876&producerGroup=p2&consumerGroup=c2";
     
     private static final String RESULT_ENDPOINT_URI = "mock:result";
 
@@ -47,8 +47,7 @@ public class RocketMQRouteTest extends CamelTestSupport {
 
             @Override
             public void configure() {
-                from(START_ENDPOINT_URI).to(INTERMEDIATE_ENDPOINT_URI);
-                from(INTERMEDIATE_ENDPOINT_URI).to(RESULT_ENDPOINT_URI);
+                from(START_ENDPOINT_URI).to(INTERMEDIATE_ENDPOINT_URI).to(RESULT_ENDPOINT_URI);
             }
         };
     }
@@ -56,9 +55,9 @@ public class RocketMQRouteTest extends CamelTestSupport {
     @Test
     public void testRouteWithTextMessage() throws Exception {
         resultEndpoint.expectedBodiesReceived("hello, RocketMQ.");
-        resultEndpoint.message(0).header("key").isEqualTo(123);
-
-        template.sendBodyAndHeader(START_ENDPOINT_URI, "hello, RocketMQ.", "key", 123);
+        resultEndpoint.message(0).predicate(exchange -> !exchange.getIn().getHeader(RocketMQConstants.MSG_ID, String.class).isBlank());
+    
+        template.sendBody(START_ENDPOINT_URI, "hello, RocketMQ.");
 
         resultEndpoint.assertIsSatisfied();
     }
