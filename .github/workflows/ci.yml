@@ -23,8 +23,9 @@ jobs:
         key: camel-cache-${{ github.sha }}
     - run: ./mvnw install -T4 -Pfastinstall
       
-  build:
+  build-came-rocketmq:
     runs-on: ubuntu-latest
+    needs: build-camel
     steps:
     - uses: actions/setup-java@v3
       with:
