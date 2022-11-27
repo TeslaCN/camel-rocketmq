@@ -22,7 +22,6 @@ import org.apache.camel.Processor;
 import org.apache.camel.Suspendable;
 import org.apache.camel.support.DefaultConsumer;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
-import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.exception.MQClientException;
@@ -30,14 +29,12 @@ import org.apache.rocketmq.common.message.MessageExt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 /**
  * @author wuweijie
  */
 public class RocketMQConsumer extends DefaultConsumer implements Suspendable {
 
-    private final Logger logger = LoggerFactory.getLogger(RocketMQConsumer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RocketMQConsumer.class);
 
     private final RocketMQEndpoint endpoint;
 
@@ -50,27 +47,22 @@ public class RocketMQConsumer extends DefaultConsumer implements Suspendable {
 
     private void startConsumer() throws MQClientException {
         if (mqPushConsumer != null) {
-            logger.warn("Overriding RocketMQ Consumer! {}", mqPushConsumer);
+            LOG.warn("Overriding RocketMQ Consumer! {}", mqPushConsumer);
         }
         mqPushConsumer = new DefaultMQPushConsumer(null, endpoint.getConsumerGroup(), AclUtils.getAclRPCHook(getEndpoint().getAccessKey(), getEndpoint().getSecretKey()));
         mqPushConsumer.setNamesrvAddr(endpoint.getNamesrvAddr());
-        mqPushConsumer.subscribe(endpoint.getTopicName(), "*");
-        mqPushConsumer.registerMessageListener(new MessageListenerConcurrently() {
-
-            @Override
-            public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
-                MessageExt messageExt = msgs.get(0);
-                Exchange exchange = endpoint.createRocketExchange(messageExt.getBody());
-                getEndpoint().getMessageConverter().setExchangeHeadersByMessageExt(exchange, messageExt);
-                try {
-                    getProcessor().process(exchange);
-                } catch (Exception e) {
-                    logger.warn(e.getLocalizedMessage());
-                    e.printStackTrace();
-                    return ConsumeConcurrentlyStatus.RECONSUME_LATER;
-                }
-                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+        mqPushConsumer.subscribe(endpoint.getTopicName(), endpoint.getSubscribeTags());
+        mqPushConsumer.registerMessageListener((MessageListenerConcurrently) (msgs, context) -> {
+            MessageExt messageExt = msgs.get(0);
+            Exchange exchange = endpoint.createRocketExchange(messageExt.getBody());
+            getEndpoint().getMessageConverter().setExchangeHeadersByMessageExt(exchange, messageExt);
+            try {
+                getProcessor().process(exchange);
+            } catch (Exception e) {
+                LOG.error(e.getLocalizedMessage());
+                return ConsumeConcurrentlyStatus.RECONSUME_LATER;
             }
+            return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
         });
         mqPushConsumer.start();
     }

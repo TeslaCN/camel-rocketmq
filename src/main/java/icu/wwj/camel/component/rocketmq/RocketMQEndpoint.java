@@ -28,16 +28,12 @@ import org.apache.camel.spi.UriParam;
 import org.apache.camel.spi.UriPath;
 import org.apache.camel.support.DefaultEndpoint;
 import org.apache.camel.support.DefaultMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @author wuweijie
  */
 @UriEndpoint(firstVersion = "2.25.0", scheme = "rocketmq", syntax = "rocketmq:topicName", title = "RocketMQ", label = "messaging")
 public class RocketMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
-
-    private final Logger logger = LoggerFactory.getLogger(RocketMQEndpoint.class);
 
     @UriPath
     @Metadata(required = true)
@@ -49,7 +45,7 @@ public class RocketMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
     private final RocketMQMessageConverter messageConverter = new RocketMQMessageConverter();
     @UriParam(label = "consumer", defaultValue = "*")
     private String subscribeTags = "*";
-    @UriParam(label = "producer", defaultValue = "")
+    @UriParam(label = "producer")
     private String sendTag = "";
     @UriParam(label = "producer")
     private String replyToTopic;
@@ -62,7 +58,7 @@ public class RocketMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
     @UriParam(label = "advance", defaultValue = "1000")
     private Long requestTimeoutCheckerInterval = 1000L;
     @UriParam(label = "producer", defaultValue = "false")
-    private Boolean waitForSendResult = false;
+    private boolean waitForSendResult = false;
     @UriParam(label = "accessKey")
     private String accessKey;
     @UriParam(label = "secretKey")
@@ -76,7 +72,7 @@ public class RocketMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
     }
 
     @Override
-    public Producer createProducer() throws Exception {
+    public Producer createProducer() {
         return new RocketMQProducer(this);
     }
 
@@ -185,11 +181,11 @@ public class RocketMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
         this.requestTimeoutCheckerInterval = requestTimeoutCheckerInterval;
     }
 
-    public Boolean getWaitForSendResult() {
+    public boolean isWaitForSendResult() {
         return waitForSendResult;
     }
 
-    public void setWaitForSendResult(Boolean waitForSendResult) {
+    public void setWaitForSendResult(boolean waitForSendResult) {
         this.waitForSendResult = waitForSendResult;
     }
 

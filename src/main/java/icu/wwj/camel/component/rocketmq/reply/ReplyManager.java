@@ -30,15 +30,11 @@ public interface ReplyManager {
 
     void setEndpoint(RocketMQEndpoint endpoint);
 
-    String getReplyToTopic();
-
     void setReplyToTopic(String replyToTopic);
 
     String registerReply(ReplyManager replyManager, Exchange exchange, AsyncCallback callback, String messageKey, long requestTimeout);
 
     void setScheduledExecutorService(ScheduledExecutorService executorService);
-
-    void updateMessageKey(String messageKey, String newMessageKey, long requestTimeout);
 
     void processReply(ReplyHolder holder);
 

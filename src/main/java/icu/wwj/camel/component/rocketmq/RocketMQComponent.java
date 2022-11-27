@@ -18,12 +18,8 @@
 package icu.wwj.camel.component.rocketmq;
 
 import org.apache.camel.spi.Metadata;
-import org.apache.camel.spi.UriParam;
-import org.apache.camel.spi.UriPath;
 import org.apache.camel.spi.annotations.Component;
 import org.apache.camel.support.DefaultComponent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
@@ -32,8 +28,6 @@ import java.util.Map;
  */
 @Component("rocketmq")
 public class RocketMQComponent extends DefaultComponent {
-
-    private final Logger logger = LoggerFactory.getLogger(RocketMQComponent.class);
 
     @Metadata(label = "producer")
     private String producerGroup;
@@ -44,7 +38,7 @@ public class RocketMQComponent extends DefaultComponent {
     @Metadata(label = "consumer", defaultValue = "*")
     private String subscribeTags = "*";
 
-    @Metadata(label = "common", defaultValue = "")
+    @Metadata(label = "common")
     private String sendTag = "";
 
     @Metadata(label = "common", defaultValue = "localhost:9876")
@@ -63,7 +57,7 @@ public class RocketMQComponent extends DefaultComponent {
     private Long requestTimeoutCheckerInterval = 1000L;
 
     @Metadata(label = "producer", defaultValue = "false")
-    private Boolean waitForSendResult = false;
+    private boolean waitForSendResult = false;
 
     @Metadata(label = "accessKey")
     private String accessKey;
@@ -74,7 +68,18 @@ public class RocketMQComponent extends DefaultComponent {
     @Override
     protected RocketMQEndpoint createEndpoint(String uri, String remaining, Map<String, Object> parameters) throws Exception {
         RocketMQEndpoint endpoint = new RocketMQEndpoint(uri, this);
-        
+        endpoint.setProducerGroup(getProducerGroup());
+        endpoint.setConsumerGroup(getConsumerGroup());
+        endpoint.setSubscribeTags(getSubscribeTags());
+        endpoint.setNamesrvAddr(getNamesrvAddr());
+        endpoint.setSendTag(getSendTag());
+        endpoint.setReplyToTopic(getReplyToTopic());
+        endpoint.setReplyToConsumerGroup(getReplyToConsumerGroup());
+        endpoint.setRequestTimeout(getRequestTimeout());
+        endpoint.setRequestTimeoutCheckerInterval(getRequestTimeoutCheckerInterval());
+        endpoint.setWaitForSendResult(isWaitForSendResult());
+        endpoint.setAccessKey(getAccessKey());
+        endpoint.setSecretKey(getSecretKey());
         setProperties(endpoint, parameters);
         endpoint.setTopicName(remaining);
         return endpoint;
@@ -152,11 +157,11 @@ public class RocketMQComponent extends DefaultComponent {
         this.requestTimeoutCheckerInterval = requestTimeoutCheckerInterval;
     }
 
-    public Boolean getWaitForSendResult() {
+    public boolean isWaitForSendResult() {
         return waitForSendResult;
     }
 
-    public void setWaitForSendResult(Boolean waitForSendResult) {
+    public void setWaitForSendResult(final boolean waitForSendResult) {
         this.waitForSendResult = waitForSendResult;
     }
 

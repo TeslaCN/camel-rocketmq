@@ -13,8 +13,6 @@ public class RocketMQRouteTest extends CamelTestSupport {
 
     private static final String START_ENDPOINT_URI = "rocketmq:START_TOPIC?namesrvAddr=127.0.0.1:59876&producerGroup=p1&consumerGroup=c1";
     
-    private static final String INTERMEDIATE_ENDPOINT_URI = "rocketmq:INTERMEDIATE_TOPIC?namesrvAddr=127.0.0.1:59876&producerGroup=p2&consumerGroup=c2";
-    
     private static final String RESULT_ENDPOINT_URI = "mock:result";
 
     private MockEndpoint resultEndpoint;
@@ -47,7 +45,7 @@ public class RocketMQRouteTest extends CamelTestSupport {
 
             @Override
             public void configure() {
-                from(START_ENDPOINT_URI).to(INTERMEDIATE_ENDPOINT_URI).to(RESULT_ENDPOINT_URI);
+                from(START_ENDPOINT_URI).to(RESULT_ENDPOINT_URI);
             }
         };
     }

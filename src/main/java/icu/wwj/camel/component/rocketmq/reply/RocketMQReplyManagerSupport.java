@@ -38,10 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author wuweijie
@@ -53,7 +51,6 @@ public class RocketMQReplyManagerSupport extends ServiceSupport implements Reply
     protected final Logger log = LoggerFactory.getLogger(RocketMQReplyManagerSupport.class);
     protected final CamelContext camelContext;
     protected final CountDownLatch replyToLatch = new CountDownLatch(1);
-    protected final long replyToTimeout = 1000;
     private final RocketMQMessageConverter messageConverter = new RocketMQMessageConverter();
     protected ScheduledExecutorService executorService;
     protected RocketMQEndpoint endpoint;
@@ -108,7 +105,7 @@ public class RocketMQReplyManagerSupport extends ServiceSupport implements Reply
     }
 
     @Override
-    protected void doStop() throws Exception {
+    protected void doStop() {
         ServiceHelper.stopService(timeoutMap);
 
         if (mqPushConsumer != null) {
@@ -126,24 +123,6 @@ public class RocketMQReplyManagerSupport extends ServiceSupport implements Reply
     @Override
     public void setEndpoint(RocketMQEndpoint endpoint) {
         this.endpoint = endpoint;
-    }
-
-    @Override
-    public String getReplyToTopic() {
-        if (replyToTopic != null) {
-            return replyToTopic;
-        }
-        try {
-            log.trace("Waiting for replyToTopic to be set");
-            boolean done = replyToLatch.await(replyToTimeout, TimeUnit.MILLISECONDS);
-            if (!done) {
-                log.warn("ReplyToTopic was not set and timeout occurred");
-            } else {
-                log.trace("Waiting for replyToTopic to be set done");
-            }
-        } catch (InterruptedException ignored) {
-        }
-        return replyToTopic;
     }
 
     @Override
@@ -170,56 +149,38 @@ public class RocketMQReplyManagerSupport extends ServiceSupport implements Reply
     }
 
     @Override
-    public void updateMessageKey(String messageKey, String newMessageKey, long requestTimeout) {
-        log.trace("Updated messageKey [{}] to [{}]", messageKey, newMessageKey);
-        Optional.ofNullable(timeoutMap.remove(messageKey)).ifPresent(handler -> {
-            timeoutMap.put(newMessageKey, handler, requestTimeout);
-        });
-    }
-
-    @Override
     public void processReply(ReplyHolder holder) {
-        if (holder != null && isRunAllowed()) {
-            try {
-                Exchange exchange = holder.getExchange();
-                boolean timeout = holder.isTimeout();
-                if (timeout) {
-                    if (log.isWarnEnabled()) {
-                        log.warn("Timeout occurred after {} millis waiting for reply message with messageKey [{}] on topic {}." +
-                                        " Setting ExchangeTimedOutException on {} and continue routing.",
-                                holder.getTimeout(), holder.getMessageKey(), replyToTopic, ExchangeHelper.logIds(exchange));
-                    }
-
-                    String msg = "reply message with messageKey: " + holder.getMessageKey() + " not received on topic: " + replyToTopic;
-                    exchange.setException(new ExchangeTimedOutException(exchange, holder.getTimeout(), msg));
-                } else {
-                    messageConverter.populateRocketExchange(exchange, holder.getMessageExt(), true);
-
-                    // restore message key
-//                    if (holder.getMessageKey() != null) {
-//                        exchange.getMessage().setHeader(RocketMQConstants.KEY, holder.getMessageKey());
-//                    }
+        if (null == holder || !isRunAllowed()) {
+            return;
+        }
+        try {
+            Exchange exchange = holder.getExchange();
+            boolean timeout = holder.isTimeout();
+            if (timeout) {
+                if (log.isWarnEnabled()) {
+                    log.warn("Timeout occurred after {} millis waiting for reply message with messageKey [{}] on topic {}." +
+                                    " Setting ExchangeTimedOutException on {} and continue routing.",
+                            holder.getTimeout(), holder.getMessageKey(), replyToTopic, ExchangeHelper.logIds(exchange));
                 }
-            } finally {
-                AsyncCallback callback = holder.getCallback();
-                callback.done(false);
+
+                String msg = "reply message with messageKey: " + holder.getMessageKey() + " not received on topic: " + replyToTopic;
+                exchange.setException(new ExchangeTimedOutException(exchange, holder.getTimeout(), msg));
+            } else {
+                messageConverter.populateRocketExchange(exchange, holder.getMessageExt(), true);
             }
+        } finally {
+            holder.getCallback().done(false);
         }
     }
 
     @Override
     public void cancelMessageKey(String messageKey) {
-        Optional.ofNullable(timeoutMap.get(messageKey)).ifPresent(replyHandler -> {
-            log.warn("Cancelling messageKey: {}", messageKey);
-            timeoutMap.remove(messageKey);
-        });
-
+        if (null == timeoutMap.get(messageKey)) {
+            return;
+        }
+        log.warn("Cancelling messageKey: {}", messageKey);
+        timeoutMap.remove(messageKey);
     }
-
-    protected ReplyHandler createReplyHandler(ReplyManager replyManager, Exchange exchange, AsyncCallback callback, String messageKey, long requestTimeout) {
-        return new RocketMQReplyHandler(replyManager, exchange, callback, messageKey, requestTimeout);
-    }
-
 
     protected void handleReplyMessage(String messageKey, MessageExt messageExt) {
         ReplyHandler handler = timeoutMap.get(messageKey);

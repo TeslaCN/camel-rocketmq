@@ -26,16 +26,12 @@ import org.apache.camel.NoTypeConversionAvailableException;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.support.DefaultAsyncProducer;
 import org.apache.camel.support.service.ServiceHelper;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.rocketmq.acl.common.AclClientRPCHook;
-import org.apache.rocketmq.acl.common.SessionCredentials;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
 import org.apache.rocketmq.client.producer.SendStatus;
 import org.apache.rocketmq.common.message.Message;
-import org.apache.rocketmq.remoting.RPCHook;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +49,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
 
     public static final String GENERATE_MESSAGE_KEY_PREFIX = "camel-rocketmq-";
 
-    private final Logger logger = LoggerFactory.getLogger(RocketMQProducer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RocketMQProducer.class);
 
     private final AtomicBoolean started = new AtomicBoolean(false);
 
@@ -80,7 +76,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
             return true;
         }
         try {
-            logger.trace("Exchange Pattern {}", exchange.getPattern());
+            LOG.trace("Exchange Pattern {}", exchange.getPattern());
             if (exchange.getPattern().isOutCapable()) {
                 return processInOut(exchange, callback);
             } else {
@@ -103,7 +99,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
         initReplyManager();
         String generateKey = GENERATE_MESSAGE_KEY_PREFIX + getEndpoint().getCamelContext().getUuidGenerator().generateUuid();
         message.setKeys(Arrays.asList(Optional.ofNullable(message.getKeys()).orElse(""), generateKey));
-        logger.debug("RocketMQ Producer sending {}", message);
+        LOG.debug("RocketMQ Producer sending {}", message);
         mqProducer.send(message, new SendCallback() {
 
             @Override
@@ -113,7 +109,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
                     callback.done(false);
                 }
                 if (replyManager == null) {
-                    logger.warn("replyToTopic not set! Will not wait for reply.");
+                    LOG.warn("replyToTopic not set! Will not wait for reply.");
                     callback.done(false);
                     return;
                 }
@@ -136,7 +132,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
                 if (started.get()) {
                     return;
                 }
-                logger.debug("Starting reply manager");
+                LOG.debug("Starting reply manager");
                 ClassLoader current = Thread.currentThread().getContextClassLoader();
                 ClassLoader ac = getEndpoint().getCamelContext().getApplicationContextClassLoader();
                 try {
@@ -145,7 +141,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
                     }
                     if (getEndpoint().getReplyToTopic() != null) {
                         replyManager = createReplyManager();
-                        logger.debug("Using RocketMQReplyManager: {} to process replies from topic {}", replyManager, getEndpoint().getReplyToTopic());
+                        LOG.debug("Using RocketMQReplyManager: {} to process replies from topic {}", replyManager, getEndpoint().getReplyToTopic());
                     }
                 } catch (Exception e) {
                     throw new FailedToCreateProducerException(getEndpoint(), e);
@@ -162,8 +158,8 @@ public class RocketMQProducer extends DefaultAsyncProducer {
     protected void unInitReplyManager() {
         try {
             if (replyManager != null) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Stopping RocketMQReplyManager: {} from processing replies from : {}", replyManager, getEndpoint().getReplyToTopic());
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Stopping RocketMQReplyManager: {} from processing replies from : {}", replyManager, getEndpoint().getReplyToTopic());
                 }
                 ServiceHelper.stopService(replyManager);
             }
@@ -180,7 +176,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
         String name = "RocketMQReplyManagerTimeoutChecker[" + getEndpoint().getTopicName() + "]";
         ScheduledExecutorService scheduledExecutorService = getEndpoint().getCamelContext().getExecutorServiceManager().newSingleThreadScheduledExecutor(name, name);
         replyManager.setScheduledExecutorService(scheduledExecutorService);
-        logger.debug("Starting ReplyManager: {}", name);
+        LOG.debug("Starting ReplyManager: {}", name);
         ServiceHelper.startService(replyManager);
         return replyManager;
     }
@@ -192,8 +188,8 @@ public class RocketMQProducer extends DefaultAsyncProducer {
         message.setTags(in.getHeader(RocketMQConstants.OVERRIDE_TAG, () -> getEndpoint().getSendTag(), String.class));
         message.setBody(exchange.getContext().getTypeConverter().mandatoryConvertTo(byte[].class, exchange, in.getBody()));
         message.setKeys(in.getHeader(RocketMQConstants.OVERRIDE_MESSAGE_KEY, "", String.class));
-        logger.debug("RocketMQ Producer sending {}", message);
-        boolean waitForSendResult = getEndpoint().getWaitForSendResult();
+        LOG.debug("RocketMQ Producer sending {}", message);
+        boolean waitForSendResult = getEndpoint().isWaitForSendResult();
         mqProducer.send(message, new SendCallback() {
 
             @Override

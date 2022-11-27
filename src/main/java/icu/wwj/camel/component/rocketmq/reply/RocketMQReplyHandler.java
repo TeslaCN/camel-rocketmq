@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RocketMQReplyHandler implements ReplyHandler {
 
-    protected final Logger logger = LoggerFactory.getLogger(RocketMQReplyHandler.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(RocketMQReplyHandler.class);
 
     protected final ReplyManager replyManager;
     protected final Exchange exchange;
@@ -46,14 +46,14 @@ public class RocketMQReplyHandler implements ReplyHandler {
 
     @Override
     public void onReply(String messageKey, MessageExt messageExt) {
-        logger.debug("onReply with messageKey: {}", messageKey);
+        LOG.debug("onReply with messageKey: {}", messageKey);
         ReplyHolder holder = new ReplyHolder(exchange, callback, messageKey, messageExt);
         replyManager.processReply(holder);
     }
 
     @Override
     public void onTimeout(String messageKey) {
-        logger.debug("onTimeout with messageKey: {}", messageKey);
+        LOG.debug("onTimeout with messageKey: {}", messageKey);
         ReplyHolder holder = new ReplyHolder(exchange, callback, messageKey, timeout);
         replyManager.processReply(holder);
     }
