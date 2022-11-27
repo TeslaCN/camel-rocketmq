@@ -21,7 +21,7 @@ jobs:
       with:
         path: ~/.m2/repository
         key: camel-cache-${{ github.sha }}
-    - run: ./mvnw install -T4 -Pfastinstall
+    - run: ./mvnw -B -T8 install -am -pl components/camel-test/camel-test-junit5 -Pfastinstall -ntp
       
   build-came-rocketmq:
     runs-on: ubuntu-latest
@@ -36,4 +36,4 @@ jobs:
       with:
         path: ~/.m2/repository
         key: camel-cache-${{ github.sha }}
-    - run: ./mvnw clean install
+    - run: ./mvnw -B clean install -ntp
