@@ -23,9 +23,6 @@ import org.apache.camel.support.DefaultComponent;
 
 import java.util.Map;
 
-/**
- * @author wuweijie
- */
 @Component("rocketmq")
 public class RocketMQComponent extends DefaultComponent {
 

@@ -19,9 +19,6 @@ package icu.wwj.camel.component.rocketmq.reply;
 
 import org.apache.rocketmq.common.message.MessageExt;
 
-/**
- * @author wuweijie
- */
 public interface ReplyHandler {
 
     void onReply(String messageKey, MessageExt messageExt);

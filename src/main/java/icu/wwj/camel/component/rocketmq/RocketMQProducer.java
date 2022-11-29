@@ -42,9 +42,6 @@ import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author wuweijie
- */
 public class RocketMQProducer extends DefaultAsyncProducer {
 
     public static final String GENERATE_MESSAGE_KEY_PREFIX = "camel-rocketmq-";

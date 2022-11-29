@@ -17,9 +17,6 @@
 
 package icu.wwj.camel.component.rocketmq;
 
-/**
- * @author wuweijie
- */
 public class SendFailedException extends RuntimeException {
 
     public SendFailedException(String message) {

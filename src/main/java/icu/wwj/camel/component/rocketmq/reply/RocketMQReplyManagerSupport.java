@@ -41,9 +41,6 @@ import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
 
-/**
- * @author wuweijie
- */
 public class RocketMQReplyManagerSupport extends ServiceSupport implements ReplyManager {
 
     private static final int CLOSE_TIMEOUT = 30 * 1000;

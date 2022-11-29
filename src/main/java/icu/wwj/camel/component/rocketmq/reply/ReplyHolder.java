@@ -21,9 +21,6 @@ import org.apache.camel.AsyncCallback;
 import org.apache.camel.Exchange;
 import org.apache.rocketmq.common.message.MessageExt;
 
-/**
- * @author wuweijie
- */
 public class ReplyHolder {
 
     private final Exchange exchange;

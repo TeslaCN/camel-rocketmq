@@ -40,9 +40,6 @@ import static icu.wwj.camel.component.rocketmq.RocketMQConstants.SYS_FLAG;
 import static icu.wwj.camel.component.rocketmq.RocketMQConstants.TAG;
 import static icu.wwj.camel.component.rocketmq.RocketMQConstants.TOPIC;
 
-/**
- * @author wuweijie
- */
 public class RocketMQMessageConverter {
 
     public void setExchangeHeadersByMessageExt(Exchange exchange, MessageExt messageExt) {

@@ -21,9 +21,6 @@ import org.apache.camel.support.DefaultTimeoutMap;
 
 import java.util.concurrent.ScheduledExecutorService;
 
-/**
- * @author wuweijie
- */
 public class ReplyTimeoutMap extends DefaultTimeoutMap<String, ReplyHandler> {
 
     public ReplyTimeoutMap(ScheduledExecutorService executor, long requestMapPollTimeMillis) {

@@ -17,11 +17,9 @@
 
 package icu.wwj.camel.component.rocketmq;
 
-/**
- * @author wuweijie
- */
 public class RocketMQConstants {
 
+    
     public static final String BROKER_NAME = "rocketmq.BROKER_NAME";
     public static final String QUEUE_ID = "rocketmq.QUEUE_ID";
     public static final String STORE_SIZE = "rocketmq.STORE_SIZE";

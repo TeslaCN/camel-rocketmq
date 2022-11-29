@@ -18,6 +18,7 @@
 package icu.wwj.camel.component.rocketmq;
 
 import org.apache.camel.AsyncEndpoint;
+import org.apache.camel.Category;
 import org.apache.camel.Consumer;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -30,9 +31,9 @@ import org.apache.camel.support.DefaultEndpoint;
 import org.apache.camel.support.DefaultMessage;
 
 /**
- * @author wuweijie
+ * Send and receive messages from <a href="https://rocketmq.apache.org/">RocketMQ</a> cluster.
  */
-@UriEndpoint(firstVersion = "2.25.0", scheme = "rocketmq", syntax = "rocketmq:topicName", title = "RocketMQ", label = "messaging")
+@UriEndpoint(firstVersion = "3.20.0", scheme = "rocketmq", syntax = "rocketmq:topicName", title = "RocketMQ", category = Category.MESSAGING, headersClass = RocketMQConstants.class)
 public class RocketMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
 
     @UriPath

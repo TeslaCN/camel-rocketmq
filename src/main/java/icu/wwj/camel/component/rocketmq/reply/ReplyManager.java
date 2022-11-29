@@ -23,9 +23,6 @@ import org.apache.camel.Exchange;
 
 import java.util.concurrent.ScheduledExecutorService;
 
-/**
- * @author wuweijie
- */
 public interface ReplyManager {
 
     void setEndpoint(RocketMQEndpoint endpoint);
