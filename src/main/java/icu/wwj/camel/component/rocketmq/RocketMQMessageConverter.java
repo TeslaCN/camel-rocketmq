@@ -46,33 +46,23 @@ import static icu.wwj.camel.component.rocketmq.RocketMQConstants.TOPIC;
 public class RocketMQMessageConverter {
 
     public void setExchangeHeadersByMessageExt(Exchange exchange, MessageExt messageExt) {
-        exchange.getIn().setHeader(BROKER_NAME, messageExt.getBrokerName());
-        exchange.getIn().setHeader(QUEUE_ID, messageExt.getQueueId());
-        exchange.getIn().setHeader(STORE_SIZE, messageExt.getStoreSize());
-        exchange.getIn().setHeader(QUEUE_OFFSET, messageExt.getQueueOffset());
-        exchange.getIn().setHeader(SYS_FLAG, messageExt.getSysFlag());
-        exchange.getIn().setHeader(BORN_TIMESTAMP, messageExt.getBornTimestamp());
-        exchange.getIn().setHeader(BORN_HOST, messageExt.getBornHost());
-        exchange.getIn().setHeader(STORE_TIMESTAMP, messageExt.getStoreTimestamp());
-        exchange.getIn().setHeader(STORE_HOST, messageExt.getStoreHost());
-        exchange.getIn().setHeader(MSG_ID, messageExt.getMsgId());
-        exchange.getIn().setHeader(COMMIT_LOG_OFFSET, messageExt.getCommitLogOffset());
-        exchange.getIn().setHeader(BODY_CRC, messageExt.getBodyCRC());
-        exchange.getIn().setHeader(RECONSUME_TIMES, messageExt.getReconsumeTimes());
-        exchange.getIn().setHeader(PREPARED_TRANSACTION_OFFSET, messageExt.getPreparedTransactionOffset());
+        populateMessageByMessageExt(exchange.getIn(), messageExt);
     }
 
     public void populateRocketExchange(Exchange exchange, MessageExt messageExt, final boolean out) {
         Message message = resolveMessageFrom(exchange, out);
         populateRoutingInfoHeaders(message, messageExt);
+        message.setBody(messageExt.getBody());
     }
 
     private void populateRoutingInfoHeaders(final Message message, final MessageExt messageExt) {
-        if (messageExt != null) {
-            message.setHeader(TOPIC, messageExt.getTopic());
-            message.setHeader(TAG, messageExt.getTags());
-            message.setHeader(KEY, messageExt.getKeys());
+        if (messageExt == null) {
+            return;
         }
+        message.setHeader(TOPIC, messageExt.getTopic());
+        message.setHeader(TAG, messageExt.getTags());
+        message.setHeader(KEY, messageExt.getKeys());
+        populateMessageByMessageExt(message, messageExt);
     }
 
     private Message resolveMessageFrom(final Exchange exchange, final boolean out) {
@@ -86,5 +76,22 @@ public class RocketMQMessageConverter {
             }
         }
         return message;
+    }
+
+    private void populateMessageByMessageExt(final Message message, final MessageExt messageExt) {
+        message.setHeader(BROKER_NAME, messageExt.getBrokerName());
+        message.setHeader(QUEUE_ID, messageExt.getQueueId());
+        message.setHeader(STORE_SIZE, messageExt.getStoreSize());
+        message.setHeader(QUEUE_OFFSET, messageExt.getQueueOffset());
+        message.setHeader(SYS_FLAG, messageExt.getSysFlag());
+        message.setHeader(BORN_TIMESTAMP, messageExt.getBornTimestamp());
+        message.setHeader(BORN_HOST, messageExt.getBornHost());
+        message.setHeader(STORE_TIMESTAMP, messageExt.getStoreTimestamp());
+        message.setHeader(STORE_HOST, messageExt.getStoreHost());
+        message.setHeader(MSG_ID, messageExt.getMsgId());
+        message.setHeader(COMMIT_LOG_OFFSET, messageExt.getCommitLogOffset());
+        message.setHeader(BODY_CRC, messageExt.getBodyCRC());
+        message.setHeader(RECONSUME_TIMES, messageExt.getReconsumeTimes());
+        message.setHeader(PREPARED_TRANSACTION_OFFSET, messageExt.getPreparedTransactionOffset());
     }
 }

@@ -6,15 +6,15 @@ import org.apache.camel.ExchangePattern;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.test.junit5.CamelTestSupport;
+import org.apache.rocketmq.broker.BrokerController;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
 import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
-import org.apache.rocketmq.client.exception.MQBrokerException;
-import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.apache.rocketmq.remoting.exception.RemotingException;
+import org.apache.rocketmq.namesrv.NamesrvController;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +39,12 @@ public class RocketMQRequestReplyRouteTest extends CamelTestSupport {
 
     private static final String RESULT_ENDPOINT_URI = "mock:result";
 
+    private static final String EXPECTED_MESSAGE = "Hi.";
+
+    private static NamesrvController namesrvController;
+
+    private static BrokerController brokerController;
+
     private MockEndpoint resultEndpoint;
 
     private DefaultMQPushConsumer replierConsumer;
@@ -47,8 +53,8 @@ public class RocketMQRequestReplyRouteTest extends CamelTestSupport {
 
     @BeforeAll
     static void beforeAll() throws Exception {
-        EmbeddedRocketMQServer.createAndStartNamesrv(NAMESRV_PORT);
-        EmbeddedRocketMQServer.createAndStartBroker(NAMESRV_ADDR);
+        namesrvController = EmbeddedRocketMQServer.createAndStartNamesrv(NAMESRV_PORT);
+        brokerController = EmbeddedRocketMQServer.createAndStartBroker(NAMESRV_ADDR);
         EmbeddedRocketMQServer.createTopic(NAMESRV_ADDR, "DefaultCluster", "START_TOPIC");
         EmbeddedRocketMQServer.createTopic(NAMESRV_ADDR, "DefaultCluster", "INTERMEDIATE_TOPIC");
         EmbeddedRocketMQServer.createTopic(NAMESRV_ADDR, "DefaultCluster", "REPLY_TO_TOPIC");
@@ -60,6 +66,7 @@ public class RocketMQRequestReplyRouteTest extends CamelTestSupport {
         super.setUp();
         resultEndpoint = (MockEndpoint) context.getEndpoint(RESULT_ENDPOINT_URI);
         replierProducer = new DefaultMQProducer("replierProducer");
+        replierProducer.setNamesrvAddr(NAMESRV_ADDR);
         replierProducer.start();
         replierConsumer = new DefaultMQPushConsumer("replierConsumer");
         replierConsumer.setNamesrvAddr(NAMESRV_ADDR);
@@ -67,10 +74,10 @@ public class RocketMQRequestReplyRouteTest extends CamelTestSupport {
         replierConsumer.registerMessageListener((MessageListenerConcurrently) (msgs, unused) -> {
             MessageExt messageExt = msgs.get(0);
             String key = messageExt.getKeys();
-            Message response = new Message("REPLY_TO_TOPIC", "", key, "OK".getBytes(StandardCharsets.UTF_8));
+            Message response = new Message("REPLY_TO_TOPIC", "", key, EXPECTED_MESSAGE.getBytes(StandardCharsets.UTF_8));
             try {
                 replierProducer.send(response);
-            } catch (MQClientException | RemotingException | MQBrokerException | InterruptedException e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
             return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
@@ -102,11 +109,10 @@ public class RocketMQRequestReplyRouteTest extends CamelTestSupport {
 
     @Test
     public void testRouteMessageInRequestReplyMode() throws Exception {
-        resultEndpoint.expectedBodiesReceived("hello, RocketMQ.");
+        resultEndpoint.expectedBodiesReceived(EXPECTED_MESSAGE);
         resultEndpoint.message(0).predicate(exchange -> !exchange.getIn().getHeader(RocketMQConstants.MSG_ID, String.class).isBlank());
 
         template.sendBody(START_ENDPOINT_URI, "hello, RocketMQ.");
-
 
         resultEndpoint.assertIsSatisfied();
     }
@@ -115,5 +121,11 @@ public class RocketMQRequestReplyRouteTest extends CamelTestSupport {
     public void tearDown() {
         replierConsumer.shutdown();
         replierProducer.shutdown();
+    }
+
+    @AfterAll
+    public static void afterAll() {
+        brokerController.shutdown();
+        namesrvController.shutdown();
     }
 }

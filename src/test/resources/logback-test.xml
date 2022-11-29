@@ -24,16 +24,6 @@
         </encoder>
     </appender>
     
-    <logger name="RocketmqWaterMark" additivity="false">
-        <level value="WARN"/>
-        <appender-ref ref="DefaultAppender"/>
-    </logger>
-    
-    <logger name="icu.wwj.camel.component.rocketmq" additivity="false">
-        <level value="TRACE"/>
-        <appender-ref ref="DefaultAppender"/>
-    </logger>
-    
     <root>
         <level value="OFF"/>
         <appender-ref ref="DefaultAppender"/>
