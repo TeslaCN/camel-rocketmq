@@ -46,17 +46,17 @@ Producer 消息发送后，启动一个 Consumer 监听 `ReplyToTopic` 参数配
 
 当 `ReplyToTpic` 中的消息包含发送消息时生成的 Key，则对应消息的 Reply 已收到，继续执行后续路由。
 
-如果超过 `requestTimeout` 毫秒后仍然没有收到 Reply，则抛出异常。
+如果超过 `requestTimeoutMillis` 毫秒后仍然没有收到 Reply，则抛出异常。
 
 ```java
 from("rocketmq:{{inout.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr}}"+
         "&consumerGroup={{inout.rocketmq.consumer.group}}"+
-        "&requestTimeout=10000")
+        "&requestTimeoutMillis=10000")
 
 .inOut("rocketmq:{{inout.rocketmq.topic.to}}?namesrvAddr={{rocketmq.namesrv.addr}}" +
         "&producerGroup={{inout.rocketmq.producer.group}}" +
         "&replyToTopic={{inout.rocketmq.reply.to.topic}}" +
-        "&requestTimeout={{inout.request.timeout}}" +
+        "&requestTimeoutMillis={{inout.request.timeout}}" +
         "&replyToConsumerGroup={{inout.rocketmq.reply.to.consumer}}"
 )
 
@@ -83,12 +83,12 @@ from("rocketmq:{{inout.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr
 
 ### InOut 模式
 
-| 参数 | 类型 | 含义 | 默认值 |
-|---|---|---|---|
-| replyToTopic | producer | 监听回复的 Topic ||
-| replyToConsumerGroup | producer | 监听回复的消费者组 ||
-| requestTimeout | producer | 等待回复时间 | 10000 |
-| requestTimeoutCheckerInterval | advance | 回复超时检查间隔 | 1000 |
+| 参数                                  | 类型 | 含义 | 默认值 |
+|-------------------------------------|---|---|---|
+| replyToTopic                        | producer | 监听回复的 Topic ||
+| replyToConsumerGroup                | producer | 监听回复的消费者组 ||
+| requestTimeoutMillis                | producer | 等待回复时间 | 10000 |
+| requestTimeoutCheckerIntervalMillis | advance | 回复超时检查间隔 | 1000 |
 
 ## Exchange Header
 

@@ -47,17 +47,17 @@ After the message sent, a consumer will listen to the topic configured by the pa
 
 When a message from `ReplyToTpic` contains the key, it means that the reply received and continue routing.
 
-If `requestTimeout` elapsed and no reply received, an exception will be thrown.
+If `requestTimeoutMillis` elapsed and no reply received, an exception will be thrown.
 
 ```java
 from("rocketmq:{{inout.rocketmq.topic.from}}?namesrvAddr={{rocketmq.namesrv.addr}}" +
         "&consumerGroup={{inout.rocketmq.consumer.group}}" +
-        "&requestTimeout=10000")
+        "&requestTimeoutMillis=10000")
 
 .inOut("rocketmq:{{inout.rocketmq.topic.to}}?namesrvAddr={{rocketmq.namesrv.addr}}" +
         "&producerGroup={{inout.rocketmq.producer.group}}" +
         "&replyToTopic={{inout.rocketmq.reply.to.topic}}" +
-        "&requestTimeout={{inout.request.timeout}}" +
+        "&requestTimeoutMillis={{inout.request.timeout}}" +
         "&replyToConsumerGroup={{inout.rocketmq.reply.to.consumer}}"
 )
 
@@ -84,12 +84,12 @@ Notice: **In InOut pattern, the message won't be routed until reply received.**
 
 ### InOut Pattern
 
-| Name | Type | Description | Default |
-|---|---|---|---|
-| replyToTopic | producer | The topic to listen for reply ||
-| replyToConsumerGroup | producer | Consumer group ||
-| requestTimeout | producer | Wait for milliseconds before timeout | 10000 |
-| requestTimeoutCheckerInterval | advance | Timeout checker interval (milliseconds) | 1000 |
+| Name                                | Type | Description | Default |
+|-------------------------------------|---|---|---|
+| replyToTopic                        | producer | The topic to listen for reply ||
+| replyToConsumerGroup                | producer | Consumer group ||
+| requestTimeoutMillis                | producer | Wait for milliseconds before timeout | 10000 |
+| requestTimeoutCheckerIntervalMillis | advance | Timeout checker interval (milliseconds) | 1000 |
 
 ## Exchange Header
 

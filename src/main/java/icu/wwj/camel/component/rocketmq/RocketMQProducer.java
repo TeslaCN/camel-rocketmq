@@ -113,7 +113,7 @@ public class RocketMQProducer extends DefaultAsyncProducer {
                     callback.done(false);
                     return;
                 }
-                replyManager.registerReply(replyManager, exchange, callback, generateKey, getEndpoint().getRequestTimeout());
+                replyManager.registerReply(replyManager, exchange, callback, generateKey, getEndpoint().getRequestTimeoutMillis());
             }
 
             @Override

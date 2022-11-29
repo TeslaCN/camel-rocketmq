@@ -35,7 +35,7 @@ public class RocketMQRequestReplyRouteTest extends CamelTestSupport {
             "&consumerGroup=intermediateConsumer" +
             "&replyToTopic=REPLY_TO_TOPIC" +
             "&replyToConsumerGroup=replyToConsumerGroup" +
-            "&requestTimeout=10000";
+            "&requestTimeoutMillis=30000";
 
     private static final String RESULT_ENDPOINT_URI = "mock:result";
 

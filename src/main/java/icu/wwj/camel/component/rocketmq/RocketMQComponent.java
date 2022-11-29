@@ -51,10 +51,10 @@ public class RocketMQComponent extends DefaultComponent {
     private String replyToConsumerGroup;
 
     @Metadata(label = "advance", defaultValue = "10000")
-    private Long requestTimeout = 10000L;
+    private long requestTimeoutMillis = 10000L;
 
     @Metadata(label = "advance", defaultValue = "1000")
-    private Long requestTimeoutCheckerInterval = 1000L;
+    private long requestTimeoutCheckerIntervalMillis = 1000L;
 
     @Metadata(label = "producer", defaultValue = "false")
     private boolean waitForSendResult = false;
@@ -75,8 +75,8 @@ public class RocketMQComponent extends DefaultComponent {
         endpoint.setSendTag(getSendTag());
         endpoint.setReplyToTopic(getReplyToTopic());
         endpoint.setReplyToConsumerGroup(getReplyToConsumerGroup());
-        endpoint.setRequestTimeout(getRequestTimeout());
-        endpoint.setRequestTimeoutCheckerInterval(getRequestTimeoutCheckerInterval());
+        endpoint.setRequestTimeoutMillis(getRequestTimeoutMillis());
+        endpoint.setRequestTimeoutCheckerIntervalMillis(getRequestTimeoutCheckerIntervalMillis());
         endpoint.setWaitForSendResult(isWaitForSendResult());
         endpoint.setAccessKey(getAccessKey());
         endpoint.setSecretKey(getSecretKey());
@@ -89,6 +89,9 @@ public class RocketMQComponent extends DefaultComponent {
         return subscribeTags;
     }
 
+    /**
+     * Subscribe tags of consumer. Multiple tags could be split by "||", such as "TagA||TagB"
+     */
     public void setSubscribeTags(String subscribeTags) {
         this.subscribeTags = subscribeTags;
     }
@@ -97,6 +100,9 @@ public class RocketMQComponent extends DefaultComponent {
         return sendTag;
     }
 
+    /**
+     * Each message would be sent with this tag.
+     */
     public void setSendTag(String sendTag) {
         this.sendTag = sendTag;
     }
@@ -105,6 +111,9 @@ public class RocketMQComponent extends DefaultComponent {
         return namesrvAddr;
     }
 
+    /**
+     * Name server address of RocketMQ cluster.
+     */
     public void setNamesrvAddr(String namesrvAddr) {
         this.namesrvAddr = namesrvAddr;
     }
@@ -113,6 +122,9 @@ public class RocketMQComponent extends DefaultComponent {
         return producerGroup;
     }
 
+    /**
+     * Producer group name.
+     */
     public void setProducerGroup(String producerGroup) {
         this.producerGroup = producerGroup;
     }
@@ -121,6 +133,9 @@ public class RocketMQComponent extends DefaultComponent {
         return consumerGroup;
     }
 
+    /**
+     * Consumer group name.
+     */
     public void setConsumerGroup(String consumerGroup) {
         this.consumerGroup = consumerGroup;
     }
@@ -129,6 +144,9 @@ public class RocketMQComponent extends DefaultComponent {
         return replyToTopic;
     }
 
+    /**
+     * Topic used for receiving response when using in-out pattern.
+     */
     public void setReplyToTopic(String replyToTopic) {
         this.replyToTopic = replyToTopic;
     }
@@ -137,31 +155,43 @@ public class RocketMQComponent extends DefaultComponent {
         return replyToConsumerGroup;
     }
 
+    /**
+     * Consumer group name used for receiving response.
+     */
     public void setReplyToConsumerGroup(String replyToConsumerGroup) {
         this.replyToConsumerGroup = replyToConsumerGroup;
     }
 
-    public Long getRequestTimeout() {
-        return requestTimeout;
+    public long getRequestTimeoutMillis() {
+        return requestTimeoutMillis;
     }
 
-    public void setRequestTimeout(Long requestTimeout) {
-        this.requestTimeout = requestTimeout;
+    /**
+     * Timeout milliseconds of receiving response when using in-out pattern.
+     */
+    public void setRequestTimeoutMillis(long requestTimeoutMillis) {
+        this.requestTimeoutMillis = requestTimeoutMillis;
     }
 
-    public Long getRequestTimeoutCheckerInterval() {
-        return requestTimeoutCheckerInterval;
+    public long getRequestTimeoutCheckerIntervalMillis() {
+        return requestTimeoutCheckerIntervalMillis;
     }
 
-    public void setRequestTimeoutCheckerInterval(Long requestTimeoutCheckerInterval) {
-        this.requestTimeoutCheckerInterval = requestTimeoutCheckerInterval;
+    /**
+     * Check interval milliseconds of request timeout.
+     */
+    public void setRequestTimeoutCheckerIntervalMillis(long requestTimeoutCheckerIntervalMillis) {
+        this.requestTimeoutCheckerIntervalMillis = requestTimeoutCheckerIntervalMillis;
     }
 
     public boolean isWaitForSendResult() {
         return waitForSendResult;
     }
 
-    public void setWaitForSendResult(final boolean waitForSendResult) {
+    /**
+     * Whether waiting for send result before routing to next endpoint.
+     */
+    public void setWaitForSendResult(boolean waitForSendResult) {
         this.waitForSendResult = waitForSendResult;
     }
 
@@ -169,6 +199,9 @@ public class RocketMQComponent extends DefaultComponent {
         return accessKey;
     }
 
+    /**
+     * Access key for RocketMQ ACL.
+     */
     public void setAccessKey(String accessKey) {
         this.accessKey = accessKey;
     }
@@ -177,6 +210,9 @@ public class RocketMQComponent extends DefaultComponent {
         return secretKey;
     }
 
+    /**
+     * Secret key for RocketMQ ACL.
+     */
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
     }

@@ -67,8 +67,8 @@ public class RocketMQReplyManagerSupport extends ServiceSupport implements Reply
         ObjectHelper.notNull(executorService, "executorService", this);
         ObjectHelper.notNull(endpoint, "endpoint", this);
 
-        log.debug("Using timeout checker interval with {} millis", endpoint.getRequestTimeoutCheckerInterval());
-        timeoutMap = new ReplyTimeoutMap(executorService, endpoint.getRequestTimeoutCheckerInterval());
+        log.debug("Using timeout checker interval with {} millis", endpoint.getRequestTimeoutCheckerIntervalMillis());
+        timeoutMap = new ReplyTimeoutMap(executorService, endpoint.getRequestTimeoutCheckerIntervalMillis());
         ServiceHelper.startService(timeoutMap);
 
         mqPushConsumer = createConsumer();
