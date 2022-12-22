@@ -1,5 +1,24 @@
 # Camel RocketMQ component
 
+## 本项目已捐赠给 Apache Camel。
+## 组件 [camel-rocketmq](https://search.maven.org/artifact/org.apache.camel/camel-rocketmq) 已由 Apache Camel 官方发布！ 
+
+Maven: https://search.maven.org/artifact/org.apache.camel/camel-rocketmq
+
+请使用以下依赖：
+```xml
+<dependency>
+    <groupId>org.apache.camel</groupId>
+    <artifactId>camel-rocketmq</artifactId>
+    <version>x.x.x</version>
+    <!-- use the same version as your Camel core version -->
+</dependency>
+```
+
+源码地址：https://github.com/apache/camel/tree/main/components/camel-rocketmq
+
+---
+
 [![GitHub Actions](https://img.shields.io/github/workflow/status/TeslaCN/camel-rocketmq/Java%20CI%20with%20Gradle)](https://github.com/TeslaCN/camel-rocketmq/actions?query=workflow%3A%22Java+CI+with+Gradle%22)
 [![Maven Central](https://img.shields.io/maven-central/v/icu.wwj.camel/camel-rocketmq)](https://repo.maven.apache.org/maven2/icu/wwj/camel/camel-rocketmq/)
 [![GitHub camel-rocketmq](https://img.shields.io/github/repo-size/TeslaCN/camel-rocketmq)](https://github.com/TeslaCN/camel-rocketmq)
